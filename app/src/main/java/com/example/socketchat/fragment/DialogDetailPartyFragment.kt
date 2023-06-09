@@ -3,7 +3,6 @@ package com.example.socketchat.fragment
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +22,6 @@ import com.example.socketchat.databinding.FragmentDialogDetailPartyBinding
 import com.example.socketchat.request.SocketRequestManager
 import com.example.socketchat.viewmodel.ChatViewModel
 import com.example.socketchat.viewmodel.SummaryViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 

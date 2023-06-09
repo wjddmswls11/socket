@@ -19,7 +19,9 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONException
@@ -41,14 +43,13 @@ class ChatViewModel : ViewModel() {
         get() = _oneOnOneFlow
 
     //파티입장
-    private val _joinPartyFlow = MutableStateFlow<List<ReJoinPartyResponse>>(emptyList())
-    val joinPartyFlow: StateFlow<List<ReJoinPartyResponse>>
+    private val _joinPartyFlow = MutableSharedFlow<ReJoinPartyResponse>()
+    val joinPartyFlow: SharedFlow<ReJoinPartyResponse>
         get() = _joinPartyFlow
 
-
     //파티입장
-    private val _ntJoinPartyFlow = MutableStateFlow<List<NtRequestJoinPartyResponse>>(emptyList())
-    val ntJoinPartyFlow: StateFlow<List<NtRequestJoinPartyResponse>>
+    private val _ntJoinPartyFlow = MutableSharedFlow<NtRequestJoinPartyResponse>()
+    val ntJoinPartyFlow: SharedFlow<NtRequestJoinPartyResponse>
         get() = _ntJoinPartyFlow
 
     //파티장 파티참여 수락
@@ -293,28 +294,15 @@ class ChatViewModel : ViewModel() {
                     Log.d("Socket Response joinPartyResponse", "ReAuthUser Response: $response")
                     // _joinPartyFlow에 추가
                     coroutineScope.launch {
-                        val currentList = _joinPartyFlow.value.toMutableList()
-                        currentList.add(response)
-                        _joinPartyFlow.value = currentList
-                        Log.d("ChatViewModel", "ReJoinPartyResponses: ${_joinPartyFlow.value}")
+                        _joinPartyFlow.emit(response)
                     }
                 }
 
                 "NtRequestJoinParty" -> {
                     val response = Gson().fromJson(data, NtRequestJoinPartyResponse::class.java)
-                    // 여기서 response를 처리합니다.
-                    Log.d(
-                        "Socket Response joinPartyResponse",
-                        "NtRequestJoinParty Response: $response"
-                    )
+                    Log.d("Socket Response joinPartyResponse", "NtRequestJoinParty Response: $response")
                     coroutineScope.launch {
-                        val currentList = _ntJoinPartyFlow.value.toMutableList()
-                        currentList.add(response)
-                        _ntJoinPartyFlow.emit(currentList)
-                        Log.d(
-                            "ChatViewModel",
-                            "NtRequestJoinPartyResponses: ${_ntJoinPartyFlow.value}"
-                        )
+                        _ntJoinPartyFlow.emit(response)
                     }
                 }
 

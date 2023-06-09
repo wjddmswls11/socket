@@ -26,8 +26,8 @@ class PartyListAdapter(private val fragmentActivity : FragmentActivity, private 
         notifyDataSetChanged()
     }
 
-    fun updateJoinPartyResponses(newJoinPartyResponses: List<ReJoinPartyResponse>) {
-        joinPartyResponses = newJoinPartyResponses
+    fun updateJoinPartyResponses(newJoinPartyResponses: ReJoinPartyResponse) {
+        joinPartyResponses = joinPartyResponses + newJoinPartyResponses
         notifyDataSetChanged()
     }
 

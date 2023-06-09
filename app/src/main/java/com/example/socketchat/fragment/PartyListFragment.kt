@@ -30,9 +30,8 @@ class PartyListFragment : Fragment() {
     private lateinit var chatViewModel: ChatViewModel
     private lateinit var partyListAdapter: PartyListAdapter
 
-    private var ntJoinPartyFlow: List<NtRequestJoinPartyResponse> = emptyList()
-    private var joinPartyFlow: List<ReJoinPartyResponse> = emptyList()
-
+    private var ntJoinPartyFlow: NtRequestJoinPartyResponse? = null
+    private var joinPartyFlow: ReJoinPartyResponse? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -110,18 +109,20 @@ class PartyListFragment : Fragment() {
                 ntJoinPartyFlow = ntJoinFlowValue
                 // joinPartyFlow의 값이 변경되었을 때 수행할 작업을 여기에 작성합니다.
                 Log.d("PartyListFragment", "joinPartyFlow: $ntJoinPartyFlow")
-                if (ntJoinPartyFlow.isNotEmpty()) {
 
-                    //방에 있는 멤버의 정보를 요청함
-                    val partyNo = ntJoinPartyFlow[0].data.SummaryPartyInfo.partyNo
-                    val ownerMemNo = ntJoinPartyFlow[0].data.SummaryPartyInfo.memNo
-                    Log.d("PartyListFragment",  "partyNo: $partyNo, memNo: $ownerMemNo")
+                //방에 있는 멤버의 정보를 요청함
+                val partyNo = ntJoinPartyFlow?.data?.SummaryPartyInfo?.partyNo
+                val ownerMemNo = ntJoinPartyFlow?.data?.SummaryPartyInfo?.memNo
+                Log.d("PartyListFragment", "partyNo: $partyNo, memNo: $ownerMemNo")
+                if (partyNo != null && ownerMemNo != null) {
                     summaryViewModel.fetchPartyMember(partyNo, ownerMemNo)
-                    Log.d("PartyListFragment",  "ntJoinPartyFlow : $ntJoinPartyFlow")
+                }
+                Log.d("PartyListFragment", "ntJoinPartyFlow : $ntJoinPartyFlow")
 
-                    val rqMemNo = ntJoinFlowValue[0].data.RqUserInfo.memNo
-                    val nickName = ntJoinFlowValue[0].data.RqUserInfo.nickName
+                val rqMemNo = ntJoinFlowValue.data.RqUserInfo.memNo
+                val nickName = ntJoinFlowValue.data.RqUserInfo.nickName
 
+                if (partyNo != null && ownerMemNo != null) {
                     showAcceptPartyDialog(partyNo, ownerMemNo, rqMemNo, nickName)
                 }
             }
@@ -133,8 +134,9 @@ class PartyListFragment : Fragment() {
                 joinPartyFlow = flowValue
                 // joinPartyFlow의 값이 변경되었을 때 수행할 작업을 여기에 작성합니다.
                 Log.d("PartyListFragment", "joinPartyFlow: $joinPartyFlow")
-                if (joinPartyFlow.isNotEmpty()) {
-                    showDenyReasonDialog(joinPartyFlow[0].data)
+                val tempFlow = joinPartyFlow
+                if (tempFlow != null) {
+                    showDenyReasonDialog(tempFlow.data)
                 }
             }
         }
@@ -144,7 +146,11 @@ class PartyListFragment : Fragment() {
             chatViewModel.kickOutFlow.collect { kickOutFlow ->
                 kickOutFlow.forEach { kickoutUserResponse ->
                     if (kickoutUserResponse.data.kickoutResult == 0) {
-                        KickoutDialog.showKickOutDialog(requireContext(), kickoutUserResponse.data.partyNo, requireActivity())
+                        KickoutDialog.showKickOutDialog(
+                            requireContext(),
+                            kickoutUserResponse.data.partyNo,
+                            requireActivity()
+                        )
                     }
                 }
             }
@@ -152,7 +158,12 @@ class PartyListFragment : Fragment() {
     }
 
     //파티가입을 받았을 때
-    private fun showAcceptPartyDialog(partyNo: Int, ownerMemNo: Int, rqMemNo: Int, nickName : String) {
+    private fun showAcceptPartyDialog(
+        partyNo: Int,
+        ownerMemNo: Int,
+        rqMemNo: Int,
+        nickName: String
+    ) {
         val message = "$nickName 가 $partyNo 번방 참여를 신청합니다"
 
         val dialogBuilder = AlertDialog.Builder(requireContext())
@@ -170,10 +181,10 @@ class PartyListFragment : Fragment() {
     }
 
 
-
     //파티가입을 신청했을 때 denyReason에 따라서 보이는 글이 다르게
     private fun showDenyReasonDialog(reJoinPartyResponseData: ReJoinPartyResponseData) {
         val message = when (reJoinPartyResponseData.denyReason) {
+            0 -> "참여되었습니다"
             1 -> "방장이 거절했습니다."
             2 -> "빈방이 없습니다."
             3 -> "방이 꽉 찼습니다."
@@ -190,6 +201,9 @@ class PartyListFragment : Fragment() {
             }
             .create()
             .show()
+
+        //이전 요청에 대한 데이터 저장
+
     }
 
 
