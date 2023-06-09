@@ -106,12 +106,8 @@ class DialogDetailPartyFragment : DialogFragment() {
                     dismiss()
                 }
 
-
-
-                //일단 isAutoJoin으로 공개방인지 아닌지를 구분하여 들어갈수 있게 하고
-                //비공개방일 경우 matchingMember가 일치하면 파티 입장이 나오도록 하고
-                //일치하는 것이 없을 경우 파티신청을 하게 된다
-                if (partyData?.isAutoJoin == true) {
+                //방에 들어갈 수 있게 하는 곳
+                if (matchingMember != null){
                     binding.dialogDetailJoinParty.visibility = View.GONE
                     binding.dialogDetailPartyPartyChat.visibility = View.VISIBLE
 
@@ -124,32 +120,14 @@ class DialogDetailPartyFragment : DialogFragment() {
                         bundle.putParcelableArrayList("partyMemberList", ArrayList<RePartyMemberListResponse>(partyMembers))
                         intent.putExtras(bundle)
 
-
                         startActivity(intent)
                         dismiss()
                     }
-                }else if (partyData?.isAutoJoin == false){
-                    if (matchingMember != null){
-                        binding.dialogDetailJoinParty.visibility = View.GONE
-                        binding.dialogDetailPartyPartyChat.visibility = View.VISIBLE
-
-                        binding.dialogDetailPartyPartyChat.setOnClickListener {
-                            val intent = Intent(requireContext(), PartyChatActivity::class.java)
-                            intent.putExtra("currentUserMemNo", currentUserMemNo)
-                            intent.putExtra("partyData", partyData)
-                            val bundle = Bundle()
-                            bundle.putParcelable("kickOutFlowValue", kickOutFlowValue)
-                            bundle.putParcelableArrayList("partyMemberList", ArrayList<RePartyMemberListResponse>(partyMembers))
-                            intent.putExtras(bundle)
-
-                            startActivity(intent)
-                            dismiss()
-                        }
-                    }else {
-                        binding.dialogDetailJoinParty.visibility = View.VISIBLE
-                        binding.dialogDetailPartyPartyChat.visibility = View.GONE
-                    }
+                }else {
+                    binding.dialogDetailJoinParty.visibility = View.VISIBLE
+                    binding.dialogDetailPartyPartyChat.visibility = View.GONE
                 }
+
                 detailPartyAdapter.updateMemberList(ArrayList(partyMembers.flatMap { it.data }))
                 detailPartyAdapter.setData(ArrayList(partyMembers.flatMap { it.data }))
             }
