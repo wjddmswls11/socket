@@ -31,14 +31,14 @@ class PartyChatActivity : AppCompatActivity() {
 
     private lateinit var kickOutFlowValue: KickoutUserResponse
 
-    private var lastMasNo : Long = System.currentTimeMillis()
+    private var lastMasNo: Long = System.currentTimeMillis()
 
 
     //스크롤이 가장 위로 올라갔을 때 이 변수가 false인 경우에만 새로운 채팅 로그 요청
     private var isFetchingChatLog: Boolean = false
 
     //첫 실행인지 아닌지 판단하는 변수
-    private var isFirstLaunch : Boolean = true
+    private var isFirstLaunch: Boolean = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,10 +91,8 @@ class PartyChatActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             viewModel.partyChatFlow.collect { partyChatResponse ->
-                for (chatData in partyChatResponse){
-                    partyChatAdapter.updatePartyChatDataList(chatData)
-                }
-                binding.partyListMessage.scrollToPosition(partyChatAdapter.itemCount -1)
+                partyChatAdapter.updatePartyChatDataList(partyChatResponse)
+                binding.partyListMessage.scrollToPosition(partyChatAdapter.itemCount - 1)
             }
         }
 
@@ -114,24 +112,29 @@ class PartyChatActivity : AppCompatActivity() {
                 Log.d("PartyChatActivity", "onCreate: 통신결과 $partyChatList")
 
 
-                for (i in partyChatList.reversed()){
+                for (i in partyChatList.reversed()) {
 
-                    if (i.data?.isNotEmpty() == true){
+                    if (i.data?.isNotEmpty() == true) {
                         val lastMsgInData = i.data[i.data.size - 1]
                         lastMasNo = lastMsgInData.data.commonRePartyChatInfo?.msgNo ?: lastMasNo
-                        Log.d("PartyChatActivity", "lastMsgInData : $lastMsgInData msgNo : $lastMasNo")
+                        Log.d(
+                            "PartyChatActivity",
+                            "lastMsgInData : $lastMsgInData msgNo : $lastMasNo"
+                        )
                     }
 
                     Log.d("PartyChatActivity", "onCreate: for문 안:  $partyChatList")
-                    for (chat in i.data){
+                    for (chat in i.data) {
                         partyChatAdapter.addPartyChatDataAtFront(chat)
                     }
 
                     //이전의 채팅 로그를 로그했을 때
                     if (!isFirstLaunch) {
                         // 이전에 보이던 첫 번째 메시지가 여전히 보이도록 스크롤 위치를 조정
-                        (binding.partyListMessage.layoutManager as LinearLayoutManager).scrollToPosition(partyChatAdapter.itemCount - oldSize)
-                    }else {
+                        (binding.partyListMessage.layoutManager as LinearLayoutManager).scrollToPosition(
+                            partyChatAdapter.itemCount - oldSize
+                        )
+                    } else {
                         (binding.partyListMessage.layoutManager as LinearLayoutManager).scrollToPosition(
                             partyChatAdapter.itemCount - 1
                         )
@@ -148,7 +151,7 @@ class PartyChatActivity : AppCompatActivity() {
             if (!isFetchingChatLog && !isFirstLaunch && layoutManager?.findFirstCompletelyVisibleItemPosition() == 0) {
                 isFetchingChatLog = true
                 summaryViewModel.fetchPartyChatLog(partyNo, rqMemNo, lastMasNo)
-            }else  {
+            } else {
                 isFirstLaunch = false
             }
         }

@@ -38,8 +38,8 @@ class ChatViewModel : ViewModel() {
         get() = _reAuthUserFlow
 
     //1:1채팅
-    private val _oneOnOneFlow = MutableStateFlow<List<Nt1On1TextChat>>(emptyList())
-    val oneOnOneFlow: StateFlow<List<Nt1On1TextChat>>
+    private val _oneOnOneFlow = MutableSharedFlow<Nt1On1TextChat>()
+    val oneOnOneFlow: SharedFlow<Nt1On1TextChat>
         get() = _oneOnOneFlow
 
     //파티입장
@@ -60,8 +60,8 @@ class ChatViewModel : ViewModel() {
 
 
     //파티채팅
-    private val _partyChatFlow = MutableStateFlow<List<PartyChatResponse>>(emptyList())
-    val partyChatFlow: StateFlow<List<PartyChatResponse>>
+    private val _partyChatFlow = MutableSharedFlow<PartyChatResponse>()
+    val partyChatFlow: SharedFlow<PartyChatResponse>
         get() = _partyChatFlow
 
 
@@ -95,7 +95,6 @@ class ChatViewModel : ViewModel() {
     init {
         setupAuthUserSocketListeners()
         setupOneOnOneSocketListeners()
-        _oneOnOneFlow.value = emptyList()
         setupJoinPartyResponse()
         setupAcceptParty()
         setupPartyChat()
@@ -250,24 +249,10 @@ class ChatViewModel : ViewModel() {
             val jsonData = JSONObject(data)
 
             when (val cmd = jsonData.optString("cmd")) {
-                "Re1On1TextChat" -> {
+                "Re1On1TextChat", "Nt1On1TextChat" -> {
                     val response = Gson().fromJson(data, Nt1On1TextChat::class.java)
-                    coroutineScope.launch {
-                        val currentList = _oneOnOneFlow.value.toMutableList()
-                        currentList.add(response)
-                        _oneOnOneFlow.emit(currentList)
-                        Log.d("ChatViewModel", "1processMessageReceived: ${_oneOnOneFlow.value}")
-                    }
-                }
-
-                "Nt1On1TextChat" -> {
-                    val response = Gson().fromJson(data, Nt1On1TextChat::class.java)
-                    coroutineScope.launch {
-                        val currentList = _oneOnOneFlow.value.toMutableList()
-                        currentList.add(response)
-                        _oneOnOneFlow.emit(currentList)
-                        Log.d("ChatViewModel", "2processMessageReceived: ${_oneOnOneFlow.value}")
-                    }
+                    _oneOnOneFlow.emit(response)
+                    Log.d("ChatViewModel", "1processMessageReceived: $response")
                 }
 
                 else -> {
@@ -300,7 +285,10 @@ class ChatViewModel : ViewModel() {
 
                 "NtRequestJoinParty" -> {
                     val response = Gson().fromJson(data, NtRequestJoinPartyResponse::class.java)
-                    Log.d("Socket Response joinPartyResponse", "NtRequestJoinParty Response: $response")
+                    Log.d(
+                        "Socket Response joinPartyResponse",
+                        "NtRequestJoinParty Response: $response"
+                    )
                     coroutineScope.launch {
                         _ntJoinPartyFlow.emit(response)
                     }
@@ -352,31 +340,10 @@ class ChatViewModel : ViewModel() {
             val jsonData = JSONObject(data)
 
             when (val cmd = jsonData.optString("cmd")) {
-                "RePartyTextChat" -> {
+                "RePartyTextChat" , "NtPartyTextChat" -> {
                     val response = Gson().fromJson(data, PartyChatResponse::class.java)
-                    coroutineScope.launch {
-                        val currentList = _partyChatFlow.value.toMutableList()
-                        currentList.add(response)
-                        _partyChatFlow.emit(currentList)
-                        Log.d(
-                            "ChatViewModel",
-                            "partyChatResponse RePartyTextChat: ${_partyChatFlow.value}"
-                        )
-                    }
-
-                }
-
-                "NtPartyTextChat" -> {
-                    val response = Gson().fromJson(data, PartyChatResponse::class.java)
-                    coroutineScope.launch {
-                        val currentList = _partyChatFlow.value.toMutableList()
-                        currentList.add(response)
-                        _partyChatFlow.emit(currentList)
-                        Log.d(
-                            "ChatViewModel",
-                            "partyChatResponse NtPartyTextChat: ${_partyChatFlow.value}"
-                        )
-                    }
+                    _partyChatFlow.emit(response)
+                    Log.d("ChatViewModel", "partyChatResponse RePartyTextChat: $response")
                 }
 
                 else -> {
@@ -474,6 +441,7 @@ class ChatViewModel : ViewModel() {
                             "ChatViewModel",
                             "kickOutResponse NtUserLeavedParty: ${_ntUserLeaveFlow.value}"
                         )
+
                     }
                 }
 

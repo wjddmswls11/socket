@@ -186,7 +186,7 @@ class SummaryViewModel : ViewModel() {
     }
 
 
-    //파티 목록을 가져오는 기능
+    //방 정보 요청
     fun fetchSummaryPartyList() {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
             Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
@@ -273,6 +273,7 @@ class SummaryViewModel : ViewModel() {
             )
             val response = service.postPartyMemberList(request)
             _partyMemberList.emit(arrayListOf(response))
+
             Log.d("SummaryViewModel", "Party Member List Response: $response")
         }
     }

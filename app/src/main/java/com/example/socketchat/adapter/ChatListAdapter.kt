@@ -15,24 +15,19 @@ import com.example.socketchat.databinding.ItemChatMessageBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class ChatListAdapter(private val currentUserMemNo: Int, private val summaryData: SummaryUserInfoResponse) : RecyclerView.Adapter<ChatListAdapter.ChatViewHolder>() {
+class ChatListAdapter(
+    private val currentUserMemNo: Int,
+    private val summaryData: SummaryUserInfoResponse
+) : RecyclerView.Adapter<ChatListAdapter.ChatViewHolder>() {
 
 
     private val oneOnOneChatList: ArrayList<Nt1On1TextChat> = arrayListOf()
 
-    //새로운 채팅 메시지를 받아와서 이미 존재하는지 확인한 후, 존재하지 않는 경우에만 리스트에 추가합니다.
+    //새로운 채팅 메시지를 받아와 리스트에 추가합니다.
     fun updateChatData(newChat: Nt1On1TextChat) {
-        var isAlreadyExists = false
-        for (chat in oneOnOneChatList) {
-            if (chat.data.commonRe1On1ChatInfo.msgNo == newChat.data.commonRe1On1ChatInfo.msgNo) {
-                isAlreadyExists = true
-                break
-            }
-        }
-        if (!isAlreadyExists) {
-            oneOnOneChatList.add(newChat)
-            notifyItemInserted(oneOnOneChatList.size - 1)
-        }
+        oneOnOneChatList.add(newChat)
+        notifyItemInserted(oneOnOneChatList.size - 1)
+
     }
 
     //이전 대화 내용의 역순으로 채팅을 표시하기 위해 새로운 채팅 메시지를 리스트의 맨 앞에 추가합니다.
@@ -42,7 +37,7 @@ class ChatListAdapter(private val currentUserMemNo: Int, private val summaryData
     }
 
     //타임 스탬프를 시간 형식으로 변환하는 함수입니다.
-    fun convertTimestampToTime(timestamp : Long) : String {
+    fun convertTimestampToTime(timestamp: Long): String {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = timestamp
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -50,11 +45,9 @@ class ChatListAdapter(private val currentUserMemNo: Int, private val summaryData
     }
 
 
-
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        val binding = ItemChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemChatMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ChatViewHolder(binding)
     }
 
@@ -67,13 +60,17 @@ class ChatListAdapter(private val currentUserMemNo: Int, private val summaryData
         holder.bind(oneOnOne)
     }
 
-    inner class ChatViewHolder(private val binding: ItemChatMessageBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(oneOnOneChatData : Nt1On1TextChat) {
+    inner class ChatViewHolder(private val binding: ItemChatMessageBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(oneOnOneChatData: Nt1On1TextChat) {
             val message = oneOnOneChatData.data.textChatInfo.msg
             val fromMemNo = oneOnOneChatData.data.commonRe1On1ChatInfo.fromMemNo
             val msgNo = oneOnOneChatData.data.commonRe1On1ChatInfo.msgNo
             val time = convertTimestampToTime(msgNo)
-            Log.d("ChatListAdapter", "Message: $message, fromMemNo: $fromMemNo, currentUserMemNo: $currentUserMemNo msgNo: $msgNo time: $time")
+            Log.d(
+                "ChatListAdapter",
+                "Message: $message, fromMemNo: $fromMemNo, currentUserMemNo: $currentUserMemNo msgNo: $msgNo time: $time"
+            )
 
             Glide.with(itemView)
                 .load(summaryData.data.mainProfileUrl)
@@ -86,7 +83,7 @@ class ChatListAdapter(private val currentUserMemNo: Int, private val summaryData
                 binding.ctlChatLeft.visibility = View.GONE
                 binding.messageTextViewRight.text = message
                 binding.messageTextViewReadRight.text = time
-            }else {
+            } else {
                 binding.ctlChatLeft.visibility = View.VISIBLE
                 binding.ctlChatRight.visibility = View.GONE
                 binding.messageTextViewLeft.text = message

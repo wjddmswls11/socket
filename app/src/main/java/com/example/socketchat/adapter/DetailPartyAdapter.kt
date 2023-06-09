@@ -17,8 +17,9 @@ import com.example.socketchat.data.Party
 import com.example.socketchat.data.RePartyMemberListResponse
 import com.example.socketchat.databinding.ItemDetailPartyBinding
 import com.example.socketchat.request.SocketRequestManager
+import com.example.socketchat.viewmodel.SummaryViewModel
 
-class DetailPartyAdapter(private val context : Context) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
+class DetailPartyAdapter(private val context : Context, private val summaryViewModel: SummaryViewModel) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
 
     private var detailList : ArrayList<MemberInfo> = arrayListOf()
     private var partyData : Party? = null

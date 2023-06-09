@@ -65,13 +65,15 @@ class DialogDetailPartyFragment : DialogFragment() {
         Log.d("DialogDetailPartyFragment", "PartyData: $partyNo, currentUserMemNo : $ownerMemNo")
 
 
-        detailPartyAdapter = DetailPartyAdapter(requireContext())
+        detailPartyAdapter = DetailPartyAdapter(requireContext(), summaryViewModel)
         detailPartyAdapter.setPartyData(partyData)
         detailPartyAdapter.setCurrentUserMemNo(currentUserMemNo)
         binding.rclDetailParty.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rclDetailParty.adapter = detailPartyAdapter
 
 
+
+        //강퇴 멤버에 대한 처리.........
         lifecycleScope.launch {
             chatViewModel.kickOutFlow.collect { kickOutFlow ->
                 kickOutFlowValue = if (kickOutFlow.isNotEmpty()){
@@ -83,7 +85,7 @@ class DialogDetailPartyFragment : DialogFragment() {
         }
 
 
-
+        //
         lifecycleScope.launch {
             summaryViewModel.partyMemberList.collect { partyMembers ->
                 Log.d("DialogDetailPartyFragment", "Collected partyMembers: $partyMembers")

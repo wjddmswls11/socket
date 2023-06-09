@@ -70,7 +70,6 @@ class CreatePartyDialogFragment : DialogFragment() {
 
             lifecycleScope.launch {
                 summaryViewModel.viewModelScope.launch {
-                    Log.d("CreatePartyDialogFragment", "Before setCreateRoomRequest")
                     summaryViewModel.setCreateRoomRequest(memNo, mainPhotoUrl, title, maxMemberCount, isAutoJoin, questContent)
                     Log.d("CreatePartyDialogFragment", "After setCreateRoomRequest")
                 }

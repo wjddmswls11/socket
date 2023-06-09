@@ -61,9 +61,7 @@ class ChatSelectActivity : AppCompatActivity() {
         //ChatViewModel의 Flow값을 관찰하고 chatListAdapter에 전달하여 UI를 업데이트합니다.
         lifecycleScope.launch {
             viewModel.oneOnOneFlow.collect { oneOnOneChatData ->
-                for (chatData in oneOnOneChatData) {
-                    chatListAdapter.updateChatData(chatData)
-                }
+                chatListAdapter.updateChatData(oneOnOneChatData)
                 binding.listMessage.scrollToPosition(chatListAdapter.itemCount - 1)
             }
         }
@@ -86,7 +84,9 @@ class ChatSelectActivity : AppCompatActivity() {
                         chatListAdapter.addChatDataAtFront(chat)
                     }
                 }
-                (binding.listMessage.layoutManager as LinearLayoutManager).scrollToPosition(chatListAdapter.itemCount - 1)
+                (binding.listMessage.layoutManager as LinearLayoutManager).scrollToPosition(
+                    chatListAdapter.itemCount - 1
+                )
             }
         }
 
@@ -104,7 +104,7 @@ class ChatSelectActivity : AppCompatActivity() {
             val msg = binding.editChatMessage.text.toString()
             if (msg.isNotBlank()) {
                 val currentMemNo = intent.getIntExtra("currentUserMemNo", 0)
-                val targetMemNo  = summaryData.data.memNo
+                val targetMemNo = summaryData.data.memNo
                 socketRequestManager.send1On1ChatRequest(
                     msg,
                     currentMemNo,
