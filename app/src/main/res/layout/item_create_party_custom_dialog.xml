@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/txt_Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="방 이름을 적어주세요"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/main_Photo_Url"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Photourl을 적어주세요"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Title" />
+
+    <EditText
+        android:id="@+id/txt_Member_Count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="최대 인원 수를 적어주세요"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_Photo_Url" />
+
+    <EditText
+        android:id="@+id/quest_Content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="내용을 적어주세요"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Member_Count" />
+
+
+    <Button
+        android:id="@+id/btn_Create_Check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="확인"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_Create_Cancel"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_Create_Cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="취소"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_Create_Check" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

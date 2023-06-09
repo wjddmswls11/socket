@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:background="@color/gray_bottom"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/img_Party_List_Auto_Join"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_lock_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+    <TextView
+        android:id="@+id/txt_Party_List_No"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="번호"
+        android:textStyle="bold"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintStart_toEndOf="@+id/img_Party_List_Auto_Join"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/txt_Party_List_Title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:text="타이틀"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/btn_Destroy_Party_List"
+        app:layout_constraintStart_toEndOf="@+id/img_Party_List_Auto_Join"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Party_List_No"/>
+
+    <TextView
+        android:id="@+id/txt_Party_List_MemNo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="방장"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintStart_toEndOf="@+id/img_Party_List_Auto_Join"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Party_List_Title"/>
+
+    <TextView
+        android:id="@+id/txt_Party_List_CurMemberCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="현재수"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintStart_toEndOf="@+id/img_Party_List_Auto_Join"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Party_List_MemNo"/>
+
+    <TextView
+        android:id="@+id/txt_Party_List_Slash"
+        android:text=" / "
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/txt_Party_List_CurMemberCount"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Party_List_MemNo"
+        />
+
+    <TextView
+        android:id="@+id/txt_Party_List_MaxMemberCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="최대멤버"
+        app:layout_constraintStart_toEndOf="@+id/txt_Party_List_Slash"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Party_List_MemNo"/>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btn_Destroy_Party_List"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:cardCornerRadius="50dp"
+        app:cardElevation="6dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/baseline_delete_24" />
+
+    </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

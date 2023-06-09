@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/menu1"
+        android:title=""
+        android:icon="@drawable/btn_footer_my"
+        android:enabled="true"/>
+
+
+    <item
+        android:id="@+id/menu2"
+        android:title=""
+        android:icon="@drawable/btn_footer_search"
+        android:enabled="true"/>
+
+
+</menu>

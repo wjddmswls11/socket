@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="dialog_width_major">90%</dimen>
+    <dimen name="dialog_width_minor">90%</dimen>
+
+</resources>

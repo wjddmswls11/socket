@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".fragment.CreatePartyDialogFragment">
+
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cls_Room_Create_First"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue_bottom"
+        android:padding="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_other_houses_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+        <EditText
+            android:id="@+id/txt_Create_Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:textCursorDrawable="@color/blue_bottom"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/blue_bottom"
+            android:hint="방 이름을 적어주세요"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cls_Room_Create_First"
+            />
+
+
+        <View
+            android:id="@+id/view_Create_Title"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/blue_bottom"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_Create_Title"/>
+
+
+
+
+        <RadioGroup
+            android:id="@+id/radio_Group_Create_Room"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_Create_Title">
+
+            <RadioButton
+                android:id="@+id/radio_Button_Create_Ture"
+                android:text="공개방"
+                android:background="@drawable/selector_radio_button"
+                android:textColor="@drawable/selector_radio_text"
+                android:button="@null"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <RadioButton
+                android:id="@+id/radio_Button_Create_False"
+                android:text="비공개방"
+                android:background="@drawable/selector_radio_button"
+                android:textColor="@drawable/selector_radio_text"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:button="@null"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RadioGroup>
+
+        <View
+            android:id="@+id/view_Create_Radio"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/blue_bottom"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radio_Group_Create_Room"/>
+
+
+
+        <EditText
+            android:id="@+id/edit_Create_Photo_Url"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@null"
+            android:textCursorDrawable="@color/blue_bottom"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/blue_bottom"
+            android:hint="Photourl을 적어주세요"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_Create_Radio" />
+
+
+        <View
+            android:id="@+id/view_Create_Photo"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/blue_bottom"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_Create_Photo_Url"/>
+
+
+
+
+
+
+        <EditText
+            android:id="@+id/edit_Create_Member_Count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:inputType="number"
+            android:textCursorDrawable="@color/blue_bottom"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/blue_bottom"
+            android:hint="최대 인원 수를 적어주세요"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_Create_Photo" />
+
+        <View
+            android:id="@+id/view_Create_Member_Count"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/blue_bottom"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_Create_Member_Count"/>
+
+
+
+        <EditText
+            android:id="@+id/edit_Create_quest_Content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:textCursorDrawable="@color/blue_bottom"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/blue_bottom"
+            android:hint="내용을 적어주세요"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_Create_Member_Count" />
+
+
+        <Button
+            android:id="@+id/btn_Create_Check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="확인"
+            android:backgroundTint="@color/blue_bottom"
+            android:textColor="@color/gray_bottom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_Create_Cancel"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/btn_Create_Cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="취소"
+            android:textColor="@color/blue_bottom"
+            android:backgroundTint="@color/gray_bottom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_Create_Check" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
