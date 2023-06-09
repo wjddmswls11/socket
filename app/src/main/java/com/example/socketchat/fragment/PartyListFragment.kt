@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.socketchat.R
 import com.example.socketchat.adapter.PartyListAdapter
 import com.example.socketchat.data.NtRequestJoinPartyResponse
 import com.example.socketchat.data.Party
@@ -22,7 +21,6 @@ import com.example.socketchat.request.SocketRequestManager
 import com.example.socketchat.viewmodel.ChatViewModel
 import com.example.socketchat.viewmodel.SummaryViewModel
 import kotlinx.coroutines.launch
-import java.io.Serializable
 
 
 class PartyListFragment : Fragment() {
@@ -53,32 +51,6 @@ class PartyListFragment : Fragment() {
             dialogFragment.show(childFragmentManager, "CreateCustomDialogFragment")
         }
 
-
-        //파티가입 신청이 들어옴
-        binding.btnJoinPartyResponse.setOnClickListener {
-            val partyNo = ntJoinPartyFlow[0].data.SummaryPartyInfo.partyNo
-            val ownerMemNo = ntJoinPartyFlow[0].data.SummaryPartyInfo.memNo
-            Log.d("PartyListFragment", "partyNo: $partyNo, memNo: $ownerMemNo")
-            summaryViewModel.fetchPartyMember(partyNo, ownerMemNo)
-
-            val joinPartyDialogFragment = PartyJoinDialogFragment()
-            val arguments = Bundle().apply {
-                putInt("currentUserMemNo", requireArguments().getInt("currentUserMemNo", -1))
-                putSerializable("partyJoinList", ArrayList(ntJoinPartyFlow) as Serializable)
-            }
-
-            joinPartyDialogFragment.arguments = arguments
-            joinPartyDialogFragment.show(childFragmentManager, "PartyJoinDialogFragment")
-
-
-        }
-
-        //파티가입 신청을 함
-        binding.btnPartyDenyReason.setOnClickListener {
-            val reJoinPartyResponseData = joinPartyFlow[0].data
-            showDenyReasonDialog(reJoinPartyResponseData)
-        }
-
         //새로고침
         binding.imgPartyChatListRight.setOnClickListener {
             summaryViewModel.fetchSummaryPartyList()
@@ -89,7 +61,7 @@ class PartyListFragment : Fragment() {
             PartyListAdapter(requireActivity(), arguments?.getInt("currentUserMemNo", -1) ?: -1)
 
         summaryViewModel = ViewModelProvider(requireActivity())[SummaryViewModel::class.java]
-        chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
+        chatViewModel = ViewModelProvider(requireActivity())[ChatViewModel::class.java]
         socketRequestManager = SocketRequestManager()
 
         //방정보 요청
@@ -139,10 +111,18 @@ class PartyListFragment : Fragment() {
                 // joinPartyFlow의 값이 변경되었을 때 수행할 작업을 여기에 작성합니다.
                 Log.d("PartyListFragment", "joinPartyFlow: $ntJoinPartyFlow")
                 if (ntJoinPartyFlow.isNotEmpty()) {
-                    binding.btnJoinPartyResponse.visibility = View.VISIBLE
 
-                } else {
-                    binding.btnJoinPartyResponse.visibility = View.GONE
+                    //방에 있는 멤버의 정보를 요청함
+                    val partyNo = ntJoinPartyFlow[0].data.SummaryPartyInfo.partyNo
+                    val ownerMemNo = ntJoinPartyFlow[0].data.SummaryPartyInfo.memNo
+                    Log.d("PartyListFragment",  "partyNo: $partyNo, memNo: $ownerMemNo")
+                    summaryViewModel.fetchPartyMember(partyNo, ownerMemNo)
+                    Log.d("PartyListFragment",  "ntJoinPartyFlow : $ntJoinPartyFlow")
+
+                    val rqMemNo = ntJoinFlowValue[0].data.RqUserInfo.memNo
+                    val nickName = ntJoinFlowValue[0].data.RqUserInfo.nickName
+
+                    showAcceptPartyDialog(partyNo, ownerMemNo, rqMemNo, nickName)
                 }
             }
         }
@@ -154,9 +134,7 @@ class PartyListFragment : Fragment() {
                 // joinPartyFlow의 값이 변경되었을 때 수행할 작업을 여기에 작성합니다.
                 Log.d("PartyListFragment", "joinPartyFlow: $joinPartyFlow")
                 if (joinPartyFlow.isNotEmpty()) {
-                    binding.btnPartyDenyReason.visibility = View.VISIBLE
-                } else {
-                    binding.btnPartyDenyReason.visibility = View.GONE
+                    showDenyReasonDialog(joinPartyFlow[0].data)
                 }
             }
         }
@@ -172,6 +150,25 @@ class PartyListFragment : Fragment() {
             }
         }
     }
+
+    //파티가입을 받았을 때
+    private fun showAcceptPartyDialog(partyNo: Int, ownerMemNo: Int, rqMemNo: Int, nickName : String) {
+        val message = "$nickName 가 $partyNo 번방 참여를 신청합니다"
+
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+        dialogBuilder.setMessage(message)
+            .setPositiveButton("수락") { _, _ ->
+                // 파티 참여 승락 처리를 진행하세요.
+                socketRequestManager.sendAcceptParty(partyNo, true, ownerMemNo, rqMemNo)
+            }
+            .setNegativeButton("거절") { _, _ ->
+                // 파티 참여 거절 처리를 진행하세요.
+                socketRequestManager.sendAcceptParty(partyNo, false, ownerMemNo, rqMemNo)
+            }
+            .create()
+            .show()
+    }
+
 
 
     //파티가입을 신청했을 때 denyReason에 따라서 보이는 글이 다르게

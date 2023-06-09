@@ -163,7 +163,6 @@ class DialogDetailPartyFragment : DialogFragment() {
                     val response = detailPartyResponses[0] // 첫 번째 response를 사용
 
                     binding.dialogDetailTitle.text = response.data.summaryPartyInfo.title
-                    binding.dialogDetailPartyNo.text = response.data.summaryPartyInfo.partyNo.toString()
                     binding.dialogDetailMemNo.text = response.data.summaryPartyInfo.memNo.toString()
                     binding.dialogDetailCurMem.text = response.data.summaryPartyInfo.curMemberCount.toString()
                     binding.dialogDetailMaxMem.text = response.data.summaryPartyInfo.maxMemberCount.toString()

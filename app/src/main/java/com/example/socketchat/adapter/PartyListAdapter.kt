@@ -65,8 +65,6 @@ class PartyListAdapter(private val fragmentActivity : FragmentActivity, private 
         RecyclerView.ViewHolder(binding.root) {
         fun bind(partyList: Party) {
 
-
-            binding.txtPartyListNo.text = partyList.partyNo.toString()
             binding.txtPartyListTitle.text = partyList.title
             binding.txtPartyListMemNo.text = partyList.memNo.toString()
             binding.txtPartyListCurMemberCount.text = partyList.curMemberCount.toString()

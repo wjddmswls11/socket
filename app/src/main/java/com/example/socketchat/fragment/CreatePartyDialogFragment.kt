@@ -10,6 +10,7 @@ import android.view.Window
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.socketchat.R
 import com.example.socketchat.databinding.FragmentCreateCustomDialogBinding
@@ -66,14 +67,14 @@ class CreatePartyDialogFragment : DialogFragment() {
 
             Log.d("CreateCustomDialog", "memNo: $memNo, mainPhotoUrl: $mainPhotoUrl, title: $title, maxMemberCount: $maxMemberCount, questContent: $questContent")
 
-            summaryViewModel.viewModelScope.launch {
-                Log.d("CreatePartyDialogFragment", "Before setCreateRoomRequest")
-                summaryViewModel.setCreateRoomRequest(memNo, mainPhotoUrl, title, maxMemberCount, isAutoJoin, questContent)
-                Log.d("CreatePartyDialogFragment", "After setCreateRoomRequest")
-//                summaryViewModel.fetchSummaryPartyList()
-                Log.d("CreatePartyDialogFragment", "After fetchSummaryPartyList")
-            }
 
+            lifecycleScope.launch {
+                summaryViewModel.viewModelScope.launch {
+                    Log.d("CreatePartyDialogFragment", "Before setCreateRoomRequest")
+                    summaryViewModel.setCreateRoomRequest(memNo, mainPhotoUrl, title, maxMemberCount, isAutoJoin, questContent)
+                    Log.d("CreatePartyDialogFragment", "After setCreateRoomRequest")
+                }
+            }
 
             dismiss()
         }

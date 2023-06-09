@@ -31,49 +31,60 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/dialog_Detail_PartyNo"
+            android:id="@+id/dialog_Detail_MemNo_txt"
+            android:text="방장 : "
+            android:layout_marginTop="30dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="방의 숫자"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_Title" />
+            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_Title"/>
+
 
         <TextView
             android:id="@+id/dialog_Detail_MemNo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:text="방장"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_PartyNo" />
+            app:layout_constraintStart_toEndOf="@+id/dialog_Detail_MemNo_txt"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_Title" />
+
+
+        <TextView
+            android:id="@+id/dialog_Detail_CurMem_Text"
+            android:text="인원수 : "
+            android:layout_marginTop="30dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/dialog_Detail_CurMem"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_Title"/>
 
         <TextView
             android:id="@+id/dialog_Detail_CurMem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:text="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_MemNo" />
+            app:layout_constraintEnd_toStartOf="@+id/dialog_Detail_Slash"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_Title" />
 
         <TextView
             android:id="@+id/dialog_Detail_Slash"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:text=" / "
-            app:layout_constraintStart_toEndOf="@+id/dialog_Detail_CurMem"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_MemNo" />
+            app:layout_constraintEnd_toStartOf="@+id/dialog_Detail_MaxMem"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_Title" />
 
         <TextView
             android:id="@+id/dialog_Detail_MaxMem"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:text="3"
-            app:layout_constraintStart_toEndOf="@+id/dialog_Detail_Slash"
-            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_MemNo" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_Detail_Title" />
 
 
         <Button
@@ -119,14 +130,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ctl_Detail_Party">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcl_Detail_Party"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ctl_Detail_Party" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcl_Detail_Party"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ctl_Detail_Party" />
     </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

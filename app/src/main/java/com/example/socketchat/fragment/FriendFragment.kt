@@ -35,8 +35,8 @@ class FriendFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        summaryViewModel = ViewModelProvider(this)[SummaryViewModel::class.java]
-        chatViewModel = ViewModelProvider(this)[ChatViewModel::class.java]
+        summaryViewModel = ViewModelProvider(requireActivity())[SummaryViewModel::class.java]
+        chatViewModel = ViewModelProvider(requireActivity())[ChatViewModel::class.java]
 
         val currentUserMemNo = arguments?.getInt("currentUserMemNo")
         val currentUserNickName = arguments?.getString("currentUserNickName")
