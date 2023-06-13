@@ -9,19 +9,18 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.socketchat.R
 import com.example.socketchat.databinding.FragmentCreateCustomDialogBinding
 import com.example.socketchat.viewmodel.SummaryViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class CreatePartyDialogFragment : DialogFragment() {
 
     private lateinit var binding: FragmentCreateCustomDialogBinding
-    private lateinit var summaryViewModel: SummaryViewModel
+    private val summaryViewModel: SummaryViewModel by activityViewModels()
     private lateinit var partyListFragment: PartyListFragment
 
     override fun onCreateView(
@@ -36,7 +35,6 @@ class CreatePartyDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        summaryViewModel = ViewModelProvider(requireActivity())[SummaryViewModel::class.java]
         partyListFragment = parentFragment as PartyListFragment
 
         binding.btnCreateCheck.setOnClickListener {
@@ -70,7 +68,7 @@ class CreatePartyDialogFragment : DialogFragment() {
 
             lifecycleScope.launch {
                 summaryViewModel.viewModelScope.launch {
-                    summaryViewModel.setCreateRoomRequest(memNo, mainPhotoUrl, title, maxMemberCount, isAutoJoin, questContent)
+                    summaryViewModel.fetchCreatePartyContext(memNo, mainPhotoUrl, title, maxMemberCount, isAutoJoin, questContent)
                     Log.d("CreatePartyDialogFragment", "After setCreateRoomRequest")
                 }
             }

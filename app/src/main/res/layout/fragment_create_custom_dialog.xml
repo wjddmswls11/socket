@@ -48,7 +48,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="10dp"
             android:textColor="@color/blue_bottom"
-            android:hint="방 이름을 적어주세요"
+            android:hint="방 이름을 적어주세요 (5글자 이상)"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cls_Room_Create_First"
             />
@@ -150,7 +150,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="10dp"
             android:textColor="@color/blue_bottom"
-            android:hint="최대 인원 수를 적어주세요"
+            android:hint="최대 인원 수를 적어주세요 (2명 이상)"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view_Create_Photo" />
 
@@ -175,7 +175,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="10dp"
             android:textColor="@color/blue_bottom"
-            android:hint="내용을 적어주세요"
+            android:hint="내용을 적어주세요 (30글자 이상)"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view_Create_Member_Count" />
 

@@ -9,13 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.socketchat.PartyChatActivity
 import com.example.socketchat.R
 import com.example.socketchat.adapter.DetailPartyAdapter
-import com.example.socketchat.data.KickoutUserResponse
 import com.example.socketchat.data.Party
 import com.example.socketchat.data.RePartyMemberListResponse
 import com.example.socketchat.databinding.FragmentDialogDetailPartyBinding
@@ -28,10 +27,9 @@ import kotlinx.coroutines.launch
 class DialogDetailPartyFragment : DialogFragment() {
 
     private lateinit var binding : FragmentDialogDetailPartyBinding
-    private lateinit var summaryViewModel : SummaryViewModel
-    private lateinit var chatViewModel : ChatViewModel
+    private val summaryViewModel : SummaryViewModel by activityViewModels()
+    private val chatViewModel : ChatViewModel by activityViewModels()
     private lateinit var detailPartyAdapter : DetailPartyAdapter
-    private var kickOutFlowValue: KickoutUserResponse? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,9 +42,6 @@ class DialogDetailPartyFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        summaryViewModel = ViewModelProvider(requireActivity())[SummaryViewModel::class.java]
-        chatViewModel = ViewModelProvider(requireActivity())[ChatViewModel::class.java]
-
         val partyData = arguments?.getSerializable("partyData") as? Party
         val currentUserMemNo = arguments?.getInt("currentUserMemNo", -1) ?: -1
 
@@ -54,7 +49,7 @@ class DialogDetailPartyFragment : DialogFragment() {
         Log.d("DialogDetailPartyFragment", "currentUserMemNo: $currentUserMemNo")
 
         //방 상세정보 리퀘스트 정보 전달
-        summaryViewModel.setDetailPartyRequest(partyData?.partyNo ?: -1)
+        summaryViewModel.fetchDetailParty(partyData?.partyNo ?: -1)
 
 
         //방 멤버 요청 리퀘스트 정보 전달
@@ -65,7 +60,7 @@ class DialogDetailPartyFragment : DialogFragment() {
         Log.d("DialogDetailPartyFragment", "PartyData: $partyNo, currentUserMemNo : $ownerMemNo")
 
 
-        detailPartyAdapter = DetailPartyAdapter(requireContext(), summaryViewModel)
+        detailPartyAdapter = DetailPartyAdapter(requireContext())
         detailPartyAdapter.setPartyData(partyData)
         detailPartyAdapter.setCurrentUserMemNo(currentUserMemNo)
         binding.rclDetailParty.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -73,19 +68,19 @@ class DialogDetailPartyFragment : DialogFragment() {
 
 
 
-        //강퇴 멤버에 대한 처리.........
+        //유저강퇴를 하고 새로고침을 해 주는 곳
         lifecycleScope.launch {
-            chatViewModel.kickOutFlow.collect { kickOutFlow ->
-                kickOutFlowValue = if (kickOutFlow.isNotEmpty()){
-                    kickOutFlow[0]
-                } else {
-                    null
+            chatViewModel.ntUserLeaveFlow.collect { ntUserLeaveFlow ->
+                if (ntUserLeaveFlow.errInfo.errNo == 0){
+                    summaryViewModel.fetchPartyMember(partyNo ?: -1, ownerMemNo ?: -1)
+                    summaryViewModel.fetchDetailParty(partyNo ?: -1)
+                    summaryViewModel.fetchSummaryPartyList()
                 }
             }
         }
 
 
-        //
+        //방 멤버를 요청해서 자신이 들어가 있는지 구분
         lifecycleScope.launch {
             summaryViewModel.partyMemberList.collect { partyMembers ->
                 Log.d("DialogDetailPartyFragment", "Collected partyMembers: $partyMembers")
@@ -98,9 +93,6 @@ class DialogDetailPartyFragment : DialogFragment() {
 
                 val matchingMember = memNosList.find { it == currentUserMemNo }
                 Log.d("DialogDetailPartyFragment", "matchingMember: $matchingMember")
-
-                val memberInfolist = partyMembers.flatMap { it.data }
-                Log.d("DialogDetailPartyFragment", "memberInfolist: $memberInfolist")
 
                 binding.dialogDetailPartyCancel.setOnClickListener {
                     dismiss()
@@ -115,8 +107,8 @@ class DialogDetailPartyFragment : DialogFragment() {
                         val intent = Intent(requireContext(), PartyChatActivity::class.java)
                         intent.putExtra("currentUserMemNo", currentUserMemNo)
                         intent.putExtra("partyData", partyData)
+
                         val bundle = Bundle()
-                        bundle.putParcelable("kickOutFlowValue", kickOutFlowValue)
                         bundle.putParcelableArrayList("partyMemberList", ArrayList<RePartyMemberListResponse>(partyMembers))
                         intent.putExtras(bundle)
 
@@ -138,7 +130,7 @@ class DialogDetailPartyFragment : DialogFragment() {
         lifecycleScope.launch {
             summaryViewModel.detailPartyContext.collect { detailPartyResponses ->
                 if (detailPartyResponses.isNotEmpty()) {
-                    val response = detailPartyResponses[0] // 첫 번째 response를 사용
+                    val response = detailPartyResponses[0]
 
                     binding.dialogDetailTitle.text = response.data.summaryPartyInfo.title
                     binding.dialogDetailMemNo.text = response.data.summaryPartyInfo.memNo.toString()

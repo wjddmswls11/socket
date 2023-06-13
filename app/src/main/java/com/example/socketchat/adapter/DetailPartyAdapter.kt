@@ -19,7 +19,8 @@ import com.example.socketchat.databinding.ItemDetailPartyBinding
 import com.example.socketchat.request.SocketRequestManager
 import com.example.socketchat.viewmodel.SummaryViewModel
 
-class DetailPartyAdapter(private val context : Context, private val summaryViewModel: SummaryViewModel) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
+class DetailPartyAdapter(
+    private val context : Context, ) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
 
     private var detailList : ArrayList<MemberInfo> = arrayListOf()
     private var partyData : Party? = null
@@ -67,11 +68,6 @@ class DetailPartyAdapter(private val context : Context, private val summaryViewM
     inner class DetailViewHolder(private val binding : ItemDetailPartyBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(detailMember : MemberInfo){
 
-            Log.d("DetailPartyAdapter", "Party No: $partyData")
-            Log.d("DetailPartyAdapter", "Party No: ${partyData?.partyNo}")
-            Log.d("DetailPartyAdapter", "Current User Mem No: $currentUserMemNo")
-            Log.d("DetailPartyAdapter", "detailList : $detailList")
-
             val partyNo = partyData?.partyNo
             val ownerMemNo = partyData?.memNo
 
@@ -79,8 +75,6 @@ class DetailPartyAdapter(private val context : Context, private val summaryViewM
                 val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val kickoutMemNo = detailList[position].memNo
-
-                    Log.d("DetailPartyAdapter", "Kicking out member: $kickoutMemNo")
 
                     if (partyNo != null && ownerMemNo != null) {
                         Log.d("DetailPartyAdapter", "Sending kick out request - Party No: $partyNo, Owner Mem No: $ownerMemNo, Kickout Mem No: $kickoutMemNo")

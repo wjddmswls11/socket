@@ -1,5 +1,6 @@
 package com.example.socketchat.adapter
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,13 +13,13 @@ import com.example.socketchat.data.Party
 import com.example.socketchat.data.ReJoinPartyResponse
 import com.example.socketchat.databinding.ItemPartyListBinding
 import com.example.socketchat.fragment.DialogDetailPartyFragment
+import com.example.socketchat.viewmodel.SummaryViewModel
 
-class PartyListAdapter(private val fragmentActivity : FragmentActivity, private val currentUserMemNo: Int) :
+class PartyListAdapter(private val fragmentActivity : FragmentActivity, private val currentUserMemNo: Int, private val summaryViewModel: SummaryViewModel) :
     RecyclerView.Adapter<PartyListAdapter.PartyViewHolder>() {
 
     private var partyList: ArrayList<Party> = arrayListOf()
     private var joinPartyResponses : List<ReJoinPartyResponse> = listOf()
-    private var onDeleteClickListener: ((Party) -> Unit)? = null
 
     fun setData(newData: ArrayList<Party>) {
         partyList.clear()
@@ -55,13 +56,29 @@ class PartyListAdapter(private val fragmentActivity : FragmentActivity, private 
             val fragmentManager = fragmentActivity.supportFragmentManager
             dialogFragment.show(fragmentManager, "DialogDetailPartyFragment")
         }
+
+
+        //삭제의 경우
+        holder.binding.btnDestroyPartyList.setOnClickListener {
+            val dialogBuilder = AlertDialog.Builder(holder.itemView.context)
+            dialogBuilder.setMessage("파티를 삭제하시겠습니까?")
+                .setPositiveButton("예") { _, _ ->
+                    val partyNo = party.partyNo
+                    val ownerMemNo = party.memNo
+
+                    summaryViewModel.fetchDestroyParty(partyNo, ownerMemNo)
+                }
+                .setNegativeButton("아니오") { _, _ ->
+                    // 아무 작업도 수행하지 않음
+                }
+                .create()
+                .show()
+
+        }
+
     }
 
-    fun setOnDeleteClickListener(listener: (Party) -> Unit) {
-        onDeleteClickListener = listener
-    }
-
-    inner class PartyViewHolder(private val binding: ItemPartyListBinding) :
+    inner class PartyViewHolder(val binding: ItemPartyListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(partyList: Party) {
 
@@ -81,14 +98,6 @@ class PartyListAdapter(private val fragmentActivity : FragmentActivity, private 
            }else{
                binding.imgPartyListAutoJoin.setImageResource(R.drawable.baseline_lock_24)
            }
-
-
-            binding.btnDestroyPartyList.setOnClickListener {
-                onDeleteClickListener?.invoke(partyList)
-            }
-
-            // joinPartyResponses를 확인하기 위한 로그
-            Log.d("PartyListAdapter", "joinPartyResponses: $joinPartyResponses")
         }
     }
 

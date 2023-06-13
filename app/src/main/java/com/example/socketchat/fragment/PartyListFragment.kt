@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.socketchat.adapter.PartyListAdapter
@@ -25,9 +25,9 @@ import kotlinx.coroutines.launch
 
 class PartyListFragment : Fragment() {
     private lateinit var binding: FragmentPartyListBinding
-    lateinit var summaryViewModel: SummaryViewModel
-    private lateinit var socketRequestManager: SocketRequestManager
-    private lateinit var chatViewModel: ChatViewModel
+    private val summaryViewModel: SummaryViewModel by activityViewModels()
+    private val chatViewModel: ChatViewModel by activityViewModels()
+    private val socketRequestManager: SocketRequestManager by lazy { SocketRequestManager() }
     private lateinit var partyListAdapter: PartyListAdapter
 
     private var ntJoinPartyFlow: NtRequestJoinPartyResponse? = null
@@ -56,12 +56,10 @@ class PartyListFragment : Fragment() {
         }
 
 
-        partyListAdapter =
-            PartyListAdapter(requireActivity(), arguments?.getInt("currentUserMemNo", -1) ?: -1)
+        summaryViewModel.fetchSummaryPartyList()
 
-        summaryViewModel = ViewModelProvider(requireActivity())[SummaryViewModel::class.java]
-        chatViewModel = ViewModelProvider(requireActivity())[ChatViewModel::class.java]
-        socketRequestManager = SocketRequestManager()
+        partyListAdapter =
+            PartyListAdapter(requireActivity(), arguments?.getInt("currentUserMemNo", -1) ?: -1, summaryViewModel)
 
         //방정보 요청
         viewLifecycleOwner.lifecycleScope.launch {
@@ -72,7 +70,7 @@ class PartyListFragment : Fragment() {
             }
         }
 
-        summaryViewModel.fetchSummaryPartyList()
+
 
 
         //파티입장
@@ -88,14 +86,6 @@ class PartyListFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
 
-        //삭제 버튼을 눌렀을 때
-        partyListAdapter.setOnDeleteClickListener { party ->
-            showDeleteConfirmationDialog(party)
-        }
-
-
-
-
 
         return binding.root
     }
@@ -108,19 +98,19 @@ class PartyListFragment : Fragment() {
             chatViewModel.ntJoinPartyFlow.collect { ntJoinFlowValue ->
                 ntJoinPartyFlow = ntJoinFlowValue
                 // joinPartyFlow의 값이 변경되었을 때 수행할 작업을 여기에 작성합니다.
-                Log.d("PartyListFragment", "joinPartyFlow: $ntJoinPartyFlow")
+                Log.d("1 PartyListFragment", "joinPartyFlow: $ntJoinPartyFlow")
 
                 //방에 있는 멤버의 정보를 요청함
-                val partyNo = ntJoinPartyFlow?.data?.SummaryPartyInfo?.partyNo
-                val ownerMemNo = ntJoinPartyFlow?.data?.SummaryPartyInfo?.memNo
-                Log.d("PartyListFragment", "partyNo: $partyNo, memNo: $ownerMemNo")
+                val partyNo = ntJoinPartyFlow?.data?.summaryPartyInfo?.partyNo
+                val ownerMemNo = ntJoinPartyFlow?.data?.summaryPartyInfo?.memNo
+                Log.d("2 PartyListFragment", "partyNo: $partyNo, memNo: $ownerMemNo")
                 if (partyNo != null && ownerMemNo != null) {
                     summaryViewModel.fetchPartyMember(partyNo, ownerMemNo)
                 }
-                Log.d("PartyListFragment", "ntJoinPartyFlow : $ntJoinPartyFlow")
+                Log.d("3 PartyListFragment", "ntJoinPartyFlow : $ntJoinPartyFlow")
 
-                val rqMemNo = ntJoinFlowValue.data.RqUserInfo.memNo
-                val nickName = ntJoinFlowValue.data.RqUserInfo.nickName
+                val rqMemNo = ntJoinFlowValue.data.rqUserInfo.memNo
+                val nickName = ntJoinFlowValue.data.rqUserInfo.nickName
 
                 if (partyNo != null && ownerMemNo != null) {
                     showAcceptPartyDialog(partyNo, ownerMemNo, rqMemNo, nickName)
@@ -144,18 +134,27 @@ class PartyListFragment : Fragment() {
         //파티에서 강퇴가 되었을 때
         viewLifecycleOwner.lifecycleScope.launch {
             chatViewModel.kickOutFlow.collect { kickOutFlow ->
-                kickOutFlow.forEach { kickoutUserResponse ->
-                    if (kickoutUserResponse.data.kickoutResult == 0) {
-                        KickoutDialog.showKickOutDialog(
-                            requireContext(),
-                            kickoutUserResponse.data.partyNo,
-                            requireActivity()
-                        )
-                    }
+                if (kickOutFlow.data.kickoutResult == 0){
+                    KickoutDialog.showKickOutDialog(requireContext(), kickOutFlow.data.partyNo, requireActivity())
                 }
             }
         }
+
+        //파티가입을 승인했을 때 새로고침이 될 수 있도록
+        viewLifecycleOwner.lifecycleScope.launch {
+            chatViewModel.ntUserJoinedPartyFlow.collect {ntUserJoinedPartyFlow ->
+                if (ntUserJoinedPartyFlow.errInfo.errNo == 0) {
+                    summaryViewModel.fetchSummaryPartyList()
+                }
+            }
+        }
+
+
     }
+
+
+
+
 
     //파티가입을 받았을 때
     private fun showAcceptPartyDialog(
@@ -183,7 +182,7 @@ class PartyListFragment : Fragment() {
 
     //파티가입을 신청했을 때 denyReason에 따라서 보이는 글이 다르게
     private fun showDenyReasonDialog(reJoinPartyResponseData: ReJoinPartyResponseData) {
-        val message = when (reJoinPartyResponseData.denyReason) {
+        val message = when (reJoinPartyResponseData.commonRe1On1ChatInfo.replyMsgNo) {
             0 -> "참여되었습니다"
             1 -> "방장이 거절했습니다."
             2 -> "빈방이 없습니다."
@@ -201,29 +200,5 @@ class PartyListFragment : Fragment() {
             }
             .create()
             .show()
-
-        //이전 요청에 대한 데이터 저장
-
     }
-
-
-    //파티를 삭제할 수 있도록
-    private fun showDeleteConfirmationDialog(party: Party) {
-        val dialogBuilder = AlertDialog.Builder(requireContext())
-        dialogBuilder.setMessage("파티를 삭제하시겠습니까?")
-            .setPositiveButton("예") { _, _ ->
-                val partyNo = party.partyNo
-                val ownerMemNo = party.memNo
-
-                summaryViewModel.setDestroyPartyRequest(partyNo, ownerMemNo)
-            }
-            .setNegativeButton("아니오") { _, _ ->
-                // 아무 작업도 수행하지 않음
-            }
-            .create()
-            .show()
-
-
-    }
-
 }

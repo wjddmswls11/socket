@@ -24,22 +24,11 @@ class PartyChatAdapter(
     private val partyChatList: ArrayList<PartyChatResponse> = arrayListOf()
 
     fun updatePartyChatDataList(newDataList: PartyChatResponse) {
-        var isAlreadyExists = false
-        val newMessageNo = newDataList.data.commonRePartyChatInfo?.msgNo
-        for (chat in partyChatList) {
-            val oldMessageNo = chat.data.commonRePartyChatInfo?.msgNo
-            if (oldMessageNo == newMessageNo) {
-                isAlreadyExists = true
-                break
-            }
-        }
-        if (!isAlreadyExists) {
-            partyChatList.add(newDataList)
-            notifyItemInserted(partyChatList.size -1)
-        }
+        partyChatList.add(newDataList)
+        notifyItemInserted(partyChatList.size - 1)
     }
 
-    fun addPartyChatDataAtFront(newData : PartyChatResponse) {
+    fun addPartyChatDataAtFront(newData: PartyChatResponse) {
         partyChatList.add(0, newData)
         notifyItemInserted(0)
     }
@@ -52,14 +41,10 @@ class PartyChatAdapter(
     }
 
 
-
-
     init {
         Log.d("PartyChatAdapter", "currentUserMemNo: $currentUserMemNo")
         Log.d("PartyChatAdapter", "partyData: $partyData")
-        Log.d("PartyChatAdapter", "partyMemberList: $partyMemberList")
     }
-
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PartyChatHolder {
@@ -80,30 +65,30 @@ class PartyChatAdapter(
 
     inner class PartyChatHolder(private val binding: ItemPartyChatSelectBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(ntUserJoinedPartyResponse: PartyChatResponse) {
-            val message = ntUserJoinedPartyResponse.data.textChatInfo?.msg ?: ""
-            val fromMemNo = ntUserJoinedPartyResponse.data.commonRePartyChatInfo?.fromMemNo ?: -1
+        fun bind(ntUserJoinedPartyResponse: PartyChatResponse?) {
+            val message = ntUserJoinedPartyResponse?.data?.textChatInfo?.msg
+            val fromMemNo = ntUserJoinedPartyResponse?.data?.commonRePartyChatInfo?.fromMemNo
+            val msgNo = ntUserJoinedPartyResponse?.data?.commonRePartyChatInfo?.msgNo
+            Log.d(
+                "ChatListAdapter",
+                "Message: $message, fromMemNo: $fromMemNo, currentUserMemNo: $currentUserMemNo msgNo: $msgNo"
+            )
+            val time = msgNo?.let { it -> convertTimestampToTime(it) }
 
-            val msgNo = ntUserJoinedPartyResponse.data.commonRePartyChatInfo.msgNo
-            Log.d("ChatListAdapter", "Message: $message, fromMemNo: $fromMemNo, currentUserMemNo: $currentUserMemNo msgNo: $msgNo")
-            val time = convertTimestampToTime(msgNo)
-
-            var memberProfileUrl : String? = null
-            var memberNickName : String? = null
-                for (member in partyMemberList) {
-                    for (data in member.data) {
-                        if (data.memNo == fromMemNo) {
-                            memberProfileUrl = data.mainProfileUrl
-                            memberNickName = data.nickName
-                            break
-                        }
-                    }
-                    if (memberProfileUrl != null) {
+            var memberProfileUrl: String? = null
+            var memberNickName: String? = null
+            for (member in partyMemberList) {
+                for (data in member.data) {
+                    if (data.memNo == fromMemNo) {
+                        memberProfileUrl = data.mainProfileUrl
+                        memberNickName = data.nickName
                         break
                     }
                 }
-
-
+                if (memberProfileUrl != null) {
+                    break
+                }
+            }
 
             Glide.with(binding.root)
                 .load(memberProfileUrl)
@@ -113,7 +98,7 @@ class PartyChatAdapter(
             binding.txtPartyChatNameLeft.text = memberNickName
 
             if (fromMemNo != -1) {
-                if (ntUserJoinedPartyResponse.data.commonRePartyChatInfo.fromMemNo == currentUserMemNo){
+                if (ntUserJoinedPartyResponse?.data?.commonRePartyChatInfo?.fromMemNo == currentUserMemNo) {
                     binding.ctlPartyChatRight.visibility = View.VISIBLE
                     binding.ctlPartyChatLeft.visibility = View.GONE
                     binding.messageTextViewPartyRight.text = message
@@ -125,7 +110,7 @@ class PartyChatAdapter(
                     binding.messageTextViewTimeLeft.text = time
                 }
 
-            }else {
+            } else {
                 binding.ctlPartyChatRight.visibility = View.GONE
                 binding.ctlPartyChatLeft.visibility = View.GONE
             }

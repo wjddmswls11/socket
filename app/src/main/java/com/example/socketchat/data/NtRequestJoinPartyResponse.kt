@@ -15,8 +15,9 @@ data class JoinErrInfo(
 )
 
 data class PartyInfo(
-    val SummaryPartyInfo: SummaryPartyInfoNt,
-    val RqUserInfo: RqUserInfo
+    val summaryPartyInfo: SummaryPartyInfoNt,
+    val rqUserInfo: RqUserInfo,
+    val commonRe1On1ChatInfo: CommonRe1On1ChatInfo
 ) : Serializable
 
 data class SummaryPartyInfoNt(
@@ -38,3 +39,12 @@ data class RqUserInfo(
     val nickName: String,
     val mainProfileUrl: String
 ) : Serializable
+
+data class CommonRe1On1ChatInfo(
+    val msgNo: Long,
+    val replyMsgNo: Int,
+    val remainReadCount: Int,
+    val isDeleted: Boolean,
+    val fromMemNo: Int,
+    val toMemNo: Int
+)

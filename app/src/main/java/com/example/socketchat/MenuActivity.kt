@@ -2,8 +2,6 @@ package com.example.socketchat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.content.res.ColorStateList
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.example.socketchat.databinding.ActivityMenuBinding

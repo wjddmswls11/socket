@@ -6,5 +6,6 @@ data class OneOnOneChatLogData(
     @SerializedName("fromMemNo") val fromMemNo: Int,
     @SerializedName("toMemNo") val toMemNo: Int,
     @SerializedName("lastMsgNo") val lastMsgNo: Long,
-    @SerializedName("countPerPage") val countPerPage: Int
+    @SerializedName("countPerPage") val countPerPage: Int,
+    @SerializedName("sortType") val sortType: Boolean
 )

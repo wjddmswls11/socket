@@ -61,13 +61,6 @@ class SummaryAdapter: RecyclerView.Adapter<SummaryAdapter.SummaryViewHolder>() {
             intent.putExtra("currentUserNickName", currentUserNickName)
             intent.putExtra("mainProfileUrl", mainProfileUrl)
             ContextCompat.startActivity(holder.itemView.context, intent, null)
-
-            // 로그 출력
-            Log.d("SummaryAdapter", "summaryData: ${summaryList[position]}")
-            Log.d("SummaryAdapter", "currentUserMemNo: $currentUserMemNo")
-            Log.d("SummaryAdapter", "currentUserNickName: $currentUserNickName")
-            Log.d("SummaryAdapter", "mainProfileUrl: $mainProfileUrl")
-
         }
     }
 

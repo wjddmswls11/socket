@@ -11,7 +11,6 @@ object KickoutDialog {
             .setMessage("당신은 $partyNo 번 방에서 강퇴되었습니다.")
             .setPositiveButton("확인") { dialog, _ ->
                 dialog.dismiss()
-                partyChatActivity.finish()
             }
         val kickOutDialog = dialogBuilder.create()
         kickOutDialog.show()

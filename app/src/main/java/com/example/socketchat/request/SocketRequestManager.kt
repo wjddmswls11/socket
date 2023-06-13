@@ -2,7 +2,6 @@ package com.example.socketchat.request
 
 import android.util.Log
 import com.example.socketchat.socket.SocketManager
-import com.google.gson.JsonObject
 import org.json.JSONObject
 
 class SocketRequestManager {
@@ -65,10 +64,12 @@ class SocketRequestManager {
         val requestData = JSONObject().apply {
             put("cmd","RqAcceptParty")
             put("data",JSONObject().apply {
-                put("partyNo", partyNo)
                 put("isAccept", isAccept)
-                put("ownerMemNo", ownerMemNo)
-                put("rqMemNo", rqMemNo)
+                put("rqJoinParty", JSONObject().apply {
+                    put("partyNo", partyNo)
+                    put("ownerMemNo", ownerMemNo)
+                    put("rqMemNo", rqMemNo)
+                })
             })
         }
         Log.d("SocketRequestManager", "Socket Request Data: $requestData")
@@ -121,8 +122,17 @@ class SocketRequestManager {
         socketManager.socket.emit("Party", requestData)
     }
 
-
-
-
-
+    //1:1채팅 삭제
+    fun sendDeleteOneOnOneChat(delMsgNo : Long, fromMemNo : Int, toMemNo : Int) {
+        val requestData = JSONObject().apply {
+            put("cmd","RqDelete1On1Chat")
+            put("data",JSONObject().apply {
+                put("delMsgNo", delMsgNo)
+                put("fromMemNo", fromMemNo)
+                put("toMemNo", toMemNo)
+            })
+        }
+        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
+        socketManager.socket.emit("Lobby", requestData)
+    }
 }

@@ -25,6 +25,18 @@ data class Nt1On1TextChat(
     val data: OneOnOneDataData
 ) : Serializable
 
+
+data class OneOnOneDataErrInfo(
+    val errNo: Int,
+    val errMsg: String
+) : Serializable
+
+data class OneOnOneDataData(
+    val textChatInfo: OneOnOneData,
+    val commonRe1On1ChatInfo: CommonChatInfo
+) : Serializable
+
+
 data class OneOnOneData(
     val msg: String
 ) : Serializable
@@ -38,13 +50,6 @@ data class CommonChatInfo(
     val toMemNo: Int
 ) : Serializable
 
-data class OneOnOneDataErrInfo(
-    val errNo: Int,
-    val errMsg: String
-) : Serializable
 
-data class OneOnOneDataData(
-    val textChatInfo: OneOnOneData,
-    val commonRe1On1ChatInfo: CommonChatInfo
-) : Serializable
+
 

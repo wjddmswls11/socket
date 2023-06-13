@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.socketchat.data.CreatePartyContextResponse
 import com.example.socketchat.data.CreateRoomRequest
 import com.example.socketchat.data.DestroyPartyRequest
 import com.example.socketchat.data.DetailPartyRequest
@@ -22,11 +23,9 @@ import com.example.socketchat.data.SummaryPartyInfo
 import com.example.socketchat.data.SummaryUserInfoResponse
 import com.example.socketchat.retrofit.NetworkManager
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import kotlin.Exception
 
 class SummaryViewModel : ViewModel() {
 
@@ -38,7 +37,9 @@ class SummaryViewModel : ViewModel() {
         get() = _summarySharedFlow
 
     //방 생성
-    private val _createPartyFlow = MutableSharedFlow<ArrayList<CreateRoomRequest>>()
+    private val _createPartyFlow = MutableSharedFlow<CreatePartyContextResponse>()
+    val createPartyFlow: SharedFlow<CreatePartyContextResponse>
+        get() = _createPartyFlow
 
     //방 정보요청
     private val _summaryListSharedFlow = MutableSharedFlow<List<Party>>()
@@ -52,20 +53,20 @@ class SummaryViewModel : ViewModel() {
 
     //방 멤버 요청
     private val _partyMemberList = MutableSharedFlow<ArrayList<RePartyMemberListResponse>>()
-    val partyMemberList : SharedFlow<ArrayList<RePartyMemberListResponse>>
+    val partyMemberList: SharedFlow<ArrayList<RePartyMemberListResponse>>
         get() = _partyMemberList
 
     //회원과의 1:1 채팅 로그 요청
     private val _oneOnOneChatLogFlow = MutableSharedFlow<ArrayList<Re1On1ChatLog>>()
-    val oneOnOneChatLogFlow : SharedFlow<ArrayList<Re1On1ChatLog>>
+    val oneOnOneChatLogFlow: SharedFlow<ArrayList<Re1On1ChatLog>>
         get() = _oneOnOneChatLogFlow
 
     //회원과의 파티 채팅 로그 요청
     private val _partyChatLogFlow = MutableSharedFlow<ArrayList<RePartyChatLog>>()
-    val partyChatLogFlow : SharedFlow<ArrayList<RePartyChatLog>>
+    val partyChatLogFlow: SharedFlow<ArrayList<RePartyChatLog>>
         get() = _partyChatLogFlow
 
-    private val summaryLoading = MutableLiveData<Boolean>()
+
     private val createPartyLoading = MutableLiveData<Boolean>()
     private val partyListLoading = MutableLiveData<Boolean>()
     private val destroyPartyLoading = MutableLiveData<Boolean>()
@@ -74,69 +75,14 @@ class SummaryViewModel : ViewModel() {
     private val oneOnOneChatLoading = MutableLiveData<Boolean>()
     private val partyChatLoading = MutableLiveData<Boolean>()
 
-    private val createRoomRequest = MutableLiveData<CreateRoomRequest>()
 
-    private var currentUserMemNo: Int? = null
-
-    fun setDetailPartyRequest(partyNo: Int) {
-        fetchDetailParty(partyNo)
-    }
-
-    //회원 인증 넘버
-    fun setCurrentUserMemNo(currentUserMemNo: Int?) {
-        this.currentUserMemNo = currentUserMemNo
-        Log.d("SummaryViewModel setCurrentUserMemNo", "Fetching data for memNo: $currentUserMemNo")
-        fetchSummaryUserInfo()
-    }
-
-    fun setCreateRoomRequest(
-        memNo: Int, mainPhotoUrl: String, title: String,
-        maxMemberCount: Int, isAutoJoin : Boolean ,questContent: String
-    ) {
-        val defaultPhotoUrl =
-            "https://demo.ycart.kr/shopboth_farm_max5_001/bbs/view_image.php?fn=http%3A%2F%2Fdemo.ycart.kr%2Fshopboth_cosmetics_001%2Fdata%2Feditor%2F1612%2Fcd2f39a0598c81712450b871c218164f_1482469221_493.jpg"
-        val summaryPartyInfo = SummaryPartyInfo(
-            memNo = memNo,
-            mainPhotoUrl = if (mainPhotoUrl.isBlank()) defaultPhotoUrl else mainPhotoUrl,
-            title = title,
-            location = "서구 마륵동",
-            maxMemberCount = maxMemberCount,
-            startTime = System.currentTimeMillis(),
-            endTime = System.currentTimeMillis(),
-            isAutoJoin = isAutoJoin
-        )
-
-        val subPhotoUrlList = listOf(
-            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fkmong.com%2Fportfolio%2Fview%2F10972&psig=AOvVaw1QRGeIV66CEaQIx_Qgd3ih&ust=1682829365123000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCOD5zYaizv4CFQAAAAAdAAAAABAE",
-            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.leagueoflegends.com%2Fko-kr%2Fchampions%2Fzed%2F&psig=AOvVaw3dPMEtuIrslBiQ1Tmkm92u&ust=1682829392161000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKDlmJOizv4CFQAAAAAdAAAAABAE",
-            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fkr.freepik.com%2Fphotos%2F%25EC%25BA%2594%25EB%2594%2594&psig=AOvVaw28t0cJAk2wY9TrX7u1iviS&ust=1682829409643000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKj12Jyizv4CFQAAAAAdAAAAABAN"
-        )
-
-        val questContent = questContent
-
-        val createRoomRequest = CreateRoomRequest(
-            summaryPartyInfo = summaryPartyInfo,
-            subPhotoUrlList = subPhotoUrlList,
-            questContent = questContent
-        )
-        this@SummaryViewModel.createRoomRequest.value = createRoomRequest
-        fetchCreatePartyContext()
-    }
-
-
-    fun setDestroyPartyRequest(partyNo: Int, ownerMemNo: Int) {
-        val destroyPartyRequest = DestroyPartyRequest(partyNo, ownerMemNo)
-        fetchDestroyParty(destroyPartyRequest)
-    }
 
 
     //사용자 정보 요청
-    private fun fetchSummaryUserInfo() {
+    fun fetchSummaryUserInfo(currentUserMemNo: Int?) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
-            summaryLoading.value = false
+            Log.e("fetchSummaryUserInfo", "Error: ${throwable.localizedMessage}")
         }) {
-            summaryLoading.value = true
 
             val memNos = listOf(10009, 10010, 10011, 10012).toMutableList()
 
@@ -160,36 +106,69 @@ class SummaryViewModel : ViewModel() {
 
 
     //파티 생성 요청
-    private fun fetchCreatePartyContext() {
-        Log.d("로그", "1")
+    fun fetchCreatePartyContext(
+        memNo: Int,
+        mainPhotoUrl: String,
+        title: String,
+        maxMemberCount: Int,
+        isAutoJoin: Boolean,
+        questContent: String
+    ) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("fetchCreatePartyContext", "Error: ${throwable.localizedMessage}")
             createPartyLoading.value = false
         }) {
             createPartyLoading.value = true
-            val request = createRoomRequest.value
-            Log.d("SummaryViewModel", "fetchCreatePartyContext request: $request")
-            if (request != null) {
-                val response = service.postCreatePartyContext(request)
-                Log.d("로그", "2")
-                Log.d("SummaryViewModel", "service.postCreatePartyContext(request): $response")
-                if (response.errInfo.errNo == 0) {
-//                    _createPartyFlow.emit(arrayListOf(request))
-                    fetchSummaryPartyList()
-                    Log.d("SummaryViewModel", "Party creation successful for request: $request")
-                } else {
-                    Log.d("SummaryViewModel", "Party creation failed for request: $request")
-                }
+
+            val defaultPhotoUrl =
+                "https://demo.ycart.kr/shopboth_farm_max5_001/bbs/view_image.php?fn=http%3A%2F%2Fdemo.ycart.kr%2Fshopboth_cosmetics_001%2Fdata%2Feditor%2F1612%2Fcd2f39a0598c81712450b871c218164f_1482469221_493.jpg"
+
+            val summaryPartyInfo = SummaryPartyInfo(
+                memNo = memNo,
+                mainPhotoUrl = if (mainPhotoUrl.isBlank()) defaultPhotoUrl else mainPhotoUrl,
+                title = title,
+                location = "서구 마륵동",
+                maxMemberCount = maxMemberCount,
+                startTime = System.currentTimeMillis(),
+                endTime = System.currentTimeMillis(),
+                isAutoJoin = isAutoJoin
+            )
+
+            val subPhotoUrlList = listOf(
+                "https://www.google.com/url?sa=i&url=https%3A%2F%2Fkmong.com%2Fportfolio%2Fview%2F10972&psig=AOvVaw1QRGeIV66CEaQIx_Qgd3ih&ust=1682829365123000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCOD5zYaizv4CFQAAAAAdAAAAABAE",
+                "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.leagueoflegends.com%2Fko-kr%2Fchampions%2Fzed%2F&psig=AOvVaw3dPMEtuIrslBiQ1Tmkm92u&ust=1682829392161000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKDlmJOizv4CFQAAAAAdAAAAABAE",
+                "https://www.google.com/url?sa=i&url=https%3A%2F%2Fkr.freepik.com%2Fphotos%2F%25EC%25BA%2594%25EB%2594%2594&psig=AOvVaw28t0cJAk2wY9TrX7u1iviS&ust=1682829409643000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCKj12Jyizv4CFQAAAAAdAAAAABAN"
+            )
+
+            val questContent = questContent
+
+            val createRoomRequest = CreateRoomRequest(
+                summaryPartyInfo = summaryPartyInfo,
+                subPhotoUrlList = subPhotoUrlList,
+                questContent = questContent
+            )
+
+            val response = service.postCreatePartyContext(
+                createRoomRequest
+            )
+
+            if (response.errInfo.errNo == 0) {
+                _createPartyFlow.emit(response)
+                Log.d("파티 생성 fetchCreatePartyContext", "$response")
+            }else{
+                Log.d(
+                    "파티 생성 fetchCreatePartyContext",
+                    "Failed to fetch party list: ${response.errInfo.errMsg}"
+                )
             }
         }
-        Log.d("로그", "3")
     }
 
 
     //방 정보 요청
     fun fetchSummaryPartyList() {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("fetchSummaryPartyList", "Error: ${throwable.localizedMessage}")
             partyListLoading.value = false
         }) {
             partyListLoading.value = true
@@ -214,31 +193,32 @@ class SummaryViewModel : ViewModel() {
     }
 
     //파티 삭제 요청
-    private fun fetchDestroyParty(request: DestroyPartyRequest) {
+    fun fetchDestroyParty(partyNo: Int, ownerMemNo: Int) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("fetchDestroyParty", "Error: ${throwable.localizedMessage}")
             destroyPartyLoading.value = false
         }) {
             destroyPartyLoading.value = true
-            val response = service.postDestroyPartyContext(request)
+            val response = service.postDestroyPartyContext(
+                DestroyPartyRequest(partyNo, ownerMemNo))
             if (response.errInfo.errNo == 0) {
                 Log.d(
                     "SummaryViewModel",
-                    "Party destruction successful for partyNo: ${request.partyNo}"
+                    "Party destruction successful for partyNo: $response"
                 )
                 fetchSummaryPartyList()
             } else {
                 Log.d(
-                    "SummaryViewModel", "Party destruction failed for partyNo: ${request.partyNo}"
+                    "SummaryViewModel", "Party destruction failed for partyNo: ${response.errInfo.errMsg}"
                 )
             }
         }
     }
 
     //방 상세정보 요청
-    private fun fetchDetailParty(partyNo: Int) {
+    fun fetchDetailParty(partyNo: Int) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("fetchDetailParty", "Error: ${throwable.localizedMessage}")
             detailPartyLoading.value = false
         }) {
             detailPartyLoading.value = true
@@ -260,8 +240,9 @@ class SummaryViewModel : ViewModel() {
 
     //방 멤버 요청
     fun fetchPartyMember(partyNo: Int, ownerMemNo: Int) {
+        Log.i("aaaaa", "call 1")
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("fetchPartyMember", "Error: ${throwable.localizedMessage}")
             partyMemberLoading.value = false
         }) {
             partyMemberLoading.value = true
@@ -272,38 +253,41 @@ class SummaryViewModel : ViewModel() {
                 CountPerPage = 30
             )
             val response = service.postPartyMemberList(request)
+            Log.i("aaaaa", "call 3")
             _partyMemberList.emit(arrayListOf(response))
 
             Log.d("SummaryViewModel", "Party Member List Response: $response")
         }
+        Log.i("aaaaa", "call 2")
     }
 
 
     //회원과의 1:1 채팅로그 요청
-    fun fetchOneOnOneChat(fromMemNo: Int, toMemNo: Int) {
+    fun fetchOneOnOneChat(fromMemNo: Int, toMemNo: Int, lastMsgNo : Long, sortType : Boolean) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("fetchOneOnOneChat", "Error: ${throwable.localizedMessage}")
             oneOnOneChatLoading.value = false
         }) {
             oneOnOneChatLoading.value = true
             val request = OneOnOneChatLogData(
                 fromMemNo = fromMemNo,
                 toMemNo = toMemNo,
-                lastMsgNo = System.currentTimeMillis(),
-                countPerPage = 60
+                lastMsgNo = lastMsgNo,
+                countPerPage = 20,
+                sortType = sortType
             )
-            Log.d("SummaryViewModel", "OneOnOneChat Request: $request")
+            Log.d("1:1 채팅 로그", "OneOnOneChat Request: $request")
             val response = service.postOneOnOneChatLog(request)
             _oneOnOneChatLogFlow.emit(arrayListOf(response))
-            Log.d("SummaryViewModel", "OneOnOneChat Response: $response")
+            Log.d("1:1 채팅 로그", "OneOnOneChat Response: $response")
         }
 
     }
 
     //회원과의 파티채팅로그 요청
-    fun fetchPartyChatLog(partyNo: Int, rqMemNo: Int, lastMsgNo: Long) {
+    fun fetchPartyChatLog(partyNo: Int, rqMemNo: Int, lastMsgNo: Long, sortType: Boolean) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("fetchPartyChatLog", "Error: ${throwable.localizedMessage}")
             partyChatLoading.value = false
         }) {
             partyChatLoading.value = true
@@ -311,7 +295,8 @@ class SummaryViewModel : ViewModel() {
                 partyNo = partyNo,
                 rqMemNo = rqMemNo,
                 lastMsgNo = lastMsgNo,
-                countPerPage = 30
+                countPerPage = 30,
+                sortType = sortType
             )
             Log.d("SummaryViewModel", "PartyChatLog Request: $request")
             val response = service.postPartyChatLog(request)

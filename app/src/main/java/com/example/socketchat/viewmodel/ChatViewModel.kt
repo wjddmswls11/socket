@@ -3,6 +3,7 @@ package com.example.socketchat.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.socketchat.data.DeleteOneOnOneResponseData
 import com.example.socketchat.data.KickoutUserResponse
 import com.example.socketchat.data.Nt1On1TextChat
 import com.example.socketchat.data.ReAuthUser
@@ -12,6 +13,7 @@ import com.example.socketchat.data.NtUserLeavedPartyChatResponse
 import com.example.socketchat.data.NtUserLeavedPartyResponse
 import com.example.socketchat.data.PartyChatResponse
 import com.example.socketchat.data.ReJoinPartyResponse
+import com.example.socketchat.data.ReJoinPartyResultResponse
 import com.example.socketchat.data.ReKickoutUserResponse
 import com.example.socketchat.data.ReLeavePartyResponse
 import com.example.socketchat.socket.SocketManager
@@ -24,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.json.JSONException
 import org.json.JSONObject
 
 class ChatViewModel : ViewModel() {
@@ -33,8 +34,8 @@ class ChatViewModel : ViewModel() {
     private val socketManager = SocketManager
 
     //회원인증
-    private val _reAuthUserFlow = MutableStateFlow<List<ReAuthUser>>(emptyList())
-    val reAuthUserFlow: StateFlow<List<ReAuthUser>>
+    private val _reAuthUserFlow = MutableSharedFlow<ReAuthUser>()
+    val reAuthUserFlow: SharedFlow<ReAuthUser>
         get() = _reAuthUserFlow
 
     //1:1채팅
@@ -52,10 +53,15 @@ class ChatViewModel : ViewModel() {
     val ntJoinPartyFlow: SharedFlow<NtRequestJoinPartyResponse>
         get() = _ntJoinPartyFlow
 
+    //파티입장
+    private val _reJoinPartyResult = MutableSharedFlow<ReJoinPartyResultResponse>()
+    val reJoinPartyResult : SharedFlow<ReJoinPartyResultResponse>
+        get() = _reJoinPartyResult
+
     //파티장 파티참여 수락
     private val _ntUserJoinedPartyFlow =
-        MutableStateFlow<List<NtUserJoinedPartyResponse>>(emptyList())
-    val ntUserJoinedPartyFlow: StateFlow<List<NtUserJoinedPartyResponse>>
+        MutableSharedFlow<NtUserJoinedPartyResponse>()
+    val ntUserJoinedPartyFlow: SharedFlow<NtUserJoinedPartyResponse>
         get() = _ntUserJoinedPartyFlow
 
 
@@ -77,19 +83,24 @@ class ChatViewModel : ViewModel() {
         get() = _ntLeavePartyFlow
 
     //유저강퇴
-    private val _kickOutFlow = MutableStateFlow<List<KickoutUserResponse>>(emptyList())
-    val kickOutFlow: StateFlow<List<KickoutUserResponse>>
+    private val _kickOutFlow = MutableSharedFlow<KickoutUserResponse>()
+    val kickOutFlow: SharedFlow<KickoutUserResponse>
         get() = _kickOutFlow
 
     //유저강퇴
-    private val _reKickOutFlow = MutableStateFlow<List<ReKickoutUserResponse>>(emptyList())
-    val reKickOutFlow: StateFlow<List<ReKickoutUserResponse>>
+    private val _reKickOutFlow = MutableSharedFlow<ReKickoutUserResponse>()
+    val reKickOutFlow: SharedFlow<ReKickoutUserResponse>
         get() = _reKickOutFlow
 
     //유저강퇴
-    private val _ntUserLeaveFlow = MutableStateFlow<List<NtUserLeavedPartyResponse>>(emptyList())
-    val ntUserLeaveFlow: StateFlow<List<NtUserLeavedPartyResponse>>
+    private val _ntUserLeaveFlow = MutableSharedFlow<NtUserLeavedPartyResponse>()
+    val ntUserLeaveFlow: SharedFlow<NtUserLeavedPartyResponse>
         get() = _ntUserLeaveFlow
+
+    //1:1채팅 삭제
+    private val _deleteOneOnOneFlow = MutableSharedFlow<DeleteOneOnOneResponseData>()
+    val deleteOneOnOneFlow : SharedFlow<DeleteOneOnOneResponseData>
+        get() = _deleteOneOnOneFlow
 
 
     init {
@@ -100,9 +111,10 @@ class ChatViewModel : ViewModel() {
         setupPartyChat()
         setupLeaveParty()
         setupKickOutUser()
+        setupDeleteOneOnOneChat()
     }
 
-
+    //회원인증
     private fun setupAuthUserSocketListeners() {
         socketManager.socket.on("Lobby") { args ->
             if (args.isNotEmpty()) {
@@ -118,6 +130,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    //1:1채팅
     private fun setupOneOnOneSocketListeners() {
         socketManager.socket.on("Lobby") { args ->
             if (args.isNotEmpty()) {
@@ -133,7 +146,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-
+    //파티입장
     private fun setupJoinPartyResponse() {
         socketManager.socket.on("Lobby") { args ->
             if (args.isNotEmpty()) {
@@ -150,6 +163,7 @@ class ChatViewModel : ViewModel() {
     }
 
 
+    //파티장파티참여 수락
     private fun setupAcceptParty() {
         socketManager.socket.on("Party") { args ->
             if (args.isNotEmpty()) {
@@ -165,7 +179,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-
+    //파티채팅
     private fun setupPartyChat() {
         socketManager.socket.on("Party") { args ->
             if (args.isNotEmpty()) {
@@ -181,6 +195,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    //파티떠나기
     private fun setupLeaveParty() {
         socketManager.socket.on("Party") { args ->
             if (args.isNotEmpty()) {
@@ -197,6 +212,7 @@ class ChatViewModel : ViewModel() {
     }
 
 
+    //유저강퇴
     private fun setupKickOutUser() {
         socketManager.socket.on("Party") { args ->
             if (args.isNotEmpty()) {
@@ -214,22 +230,39 @@ class ChatViewModel : ViewModel() {
     }
 
 
+    //1:1채팅 삭제
+    private fun setupDeleteOneOnOneChat(){
+        socketManager.socket.on("Lobby") {args ->
+            if (args.isNotEmpty()){
+                try {
+                    val data = args[0] as String
+                    deleteOneOnOneResponse(data)
+                } catch (e: Exception) {
+                    Log.d("Socket Response", "Invalid data format: Unable to parse JSON data")
+                }
+            } else {
+                Log.d("Socket Response", "Invalid data format: args is empty")
+            }
+        }
+    }
+
+
     //회원인증
     private fun authUserSocketResponse(data: String) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("ChatViewModel", "Error: ${throwable.localizedMessage}")
         }) {
             Log.d("Socket Response", "Original JSON Response: authUserSocketResponse $data")
             val jsonData = JSONObject(data)
             when (val cmd = jsonData.optString("cmd")) {
                 "ReAuthUser" -> {
                     val response = Gson().fromJson(data, ReAuthUser::class.java)
-                    coroutineScope.launch {
-                        val currentList = _reAuthUserFlow.value.toMutableList()
-                        currentList.add(response)
-                        _reAuthUserFlow.emit(currentList)
-                        Log.d("ChatViewModel", "authUserSocketResponse: ${_reAuthUserFlow.value}")
-                    }
+                    _reAuthUserFlow.emit(response)
+                    Log.d(
+                        "ChatViewModel",
+                        "authUserSocketResponse: ${_reAuthUserFlow.emit(response)}"
+                    )
+
                 }
 
                 else -> {
@@ -243,7 +276,7 @@ class ChatViewModel : ViewModel() {
     //1:1채팅
     private fun processMessageReceived(data: String) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("ChatViewModel", "Error: ${throwable.localizedMessage}")
         }) {
             Log.d("Socket Response", "Original JSON Response: processMessageReceived $data")
             val jsonData = JSONObject(data)
@@ -265,7 +298,7 @@ class ChatViewModel : ViewModel() {
     //파티입장
     private fun joinPartyResponse(data: String) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("ChatViewModel", "Error: ${throwable.localizedMessage}")
         }) {
 
             // 로그에 원본 JSON 응답 출력
@@ -276,7 +309,7 @@ class ChatViewModel : ViewModel() {
             when (val cmd = jsonData.optString("cmd")) {
                 "ReJoinParty" -> {
                     val response = Gson().fromJson(data, ReJoinPartyResponse::class.java)
-                    Log.d("Socket Response joinPartyResponse", "ReAuthUser Response: $response")
+                    Log.d("파티입장", "ReJoinParty Response: $response")
                     // _joinPartyFlow에 추가
                     coroutineScope.launch {
                         _joinPartyFlow.emit(response)
@@ -286,12 +319,24 @@ class ChatViewModel : ViewModel() {
                 "NtRequestJoinParty" -> {
                     val response = Gson().fromJson(data, NtRequestJoinPartyResponse::class.java)
                     Log.d(
-                        "Socket Response joinPartyResponse",
+                        "파티입장",
                         "NtRequestJoinParty Response: $response"
                     )
                     coroutineScope.launch {
                         _ntJoinPartyFlow.emit(response)
                     }
+                }
+
+                "ReJoinPartyResult" -> {
+                    val response = Gson().fromJson(data, ReJoinPartyResultResponse::class.java)
+                    Log.d(
+                        "파티입장",
+                        "ReJoinPartyResult Response: $response"
+                    )
+                    coroutineScope.launch {
+                        _reJoinPartyResult.emit(response)
+                    }
+
                 }
 
                 else -> {
@@ -304,27 +349,23 @@ class ChatViewModel : ViewModel() {
     //파티장 파티참여 수락
     private fun acceptPartyResponse(data: String) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("수락 ChatViewModel", "Error: ${throwable.localizedMessage}")
         }) {
-            Log.d("Socket Response", "Original JSON Response: acceptPartyResponse $data")
+            Log.d("수락 Socket Response", "Original JSON Response: acceptPartyResponse $data")
             val jsonData = JSONObject(data)
 
             when (val cmd = jsonData.optString("cmd")) {
                 "NtUserJoinedParty" -> {
                     val response = Gson().fromJson(data, NtUserJoinedPartyResponse::class.java)
-                    coroutineScope.launch {
-                        val currentList = _ntUserJoinedPartyFlow.value.toMutableList()
-                        currentList.add(response)
-                        _ntUserJoinedPartyFlow.emit(currentList)
-                        Log.d(
-                            "ChatViewModel",
-                            "NtRequestJoinPartyResponses: ${_ntUserJoinedPartyFlow.value}"
-                        )
-                    }
+                    _ntUserJoinedPartyFlow.emit(response)
+                    Log.d(
+                        "수락  ChatViewModel",
+                        "수락 NtRequestJoinPartyResponses: $response"
+                    )
                 }
 
                 else -> {
-                    Log.d("Socket Response", "Unsupported command: $cmd")
+                    Log.d("수락 Socket Response", "Unsupported command: $cmd")
                 }
             }
         }
@@ -334,13 +375,13 @@ class ChatViewModel : ViewModel() {
     //파티채팅
     private fun partyChatResponse(data: String) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("ChatViewModel", "Error: ${throwable.localizedMessage}")
         }) {
             Log.d("Socket Response", "Original JSON Response: PartyChatResponse  $data")
             val jsonData = JSONObject(data)
 
             when (val cmd = jsonData.optString("cmd")) {
-                "RePartyTextChat" , "NtPartyTextChat" -> {
+                "RePartyTextChat", "NtPartyTextChat" -> {
                     val response = Gson().fromJson(data, PartyChatResponse::class.java)
                     _partyChatFlow.emit(response)
                     Log.d("ChatViewModel", "partyChatResponse RePartyTextChat: $response")
@@ -357,7 +398,7 @@ class ChatViewModel : ViewModel() {
     //파티떠나기
     private fun leavePartyResponse(data: String) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("ChatViewModel", "Error: ${throwable.localizedMessage}")
         }) {
             Log.d("Socket Response", "Original JSON Response: kickOutResponse $data")
             val jsonData = JSONObject(data)
@@ -399,7 +440,7 @@ class ChatViewModel : ViewModel() {
     //유저강퇴
     private fun kickOutResponse(data: String) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-            Log.e("SummaryViewModel", "Error: ${throwable.localizedMessage}")
+            Log.e("ChatViewModel", "Error: ${throwable.localizedMessage}")
         }) {
 
             Log.d("Socket Response", "Original JSON Response: kickOutResponse $data")
@@ -407,42 +448,58 @@ class ChatViewModel : ViewModel() {
             when (val cmd = jsonData.optString("cmd")) {
                 "NtKickoutUser" -> {
                     val response = Gson().fromJson(data, KickoutUserResponse::class.java)
-                    coroutineScope.launch {
-                        val currentList = _kickOutFlow.value.toMutableList()
-                        currentList.add(response)
-                        _kickOutFlow.emit(currentList)
-                        Log.d(
-                            "ChatViewModel",
-                            "kickOutResponse RqKickoutUser: ${_kickOutFlow.value}"
-                        )
-                    }
+                    _kickOutFlow.emit(response)
+                    Log.d(
+                        "ChatViewModel",
+                        "kickOutResponse RqKickoutUser: ${_kickOutFlow.emit(response)}"
+                    )
                 }
 
                 "ReKickoutUser" -> {
                     val response = Gson().fromJson(data, ReKickoutUserResponse::class.java)
-                    coroutineScope.launch {
-                        val currentList = _reKickOutFlow.value.toMutableList()
-                        currentList.add(response)
-                        _reKickOutFlow.emit(currentList)
-                        Log.d(
-                            "ChatViewModel",
-                            "kickOutResponse ReKickoutUser: ${_reKickOutFlow.value}"
-                        )
-                    }
+                    _reKickOutFlow.emit(response)
+                    Log.d(
+                        "ChatViewModel",
+                        "kickOutResponse ReKickoutUser: ${_reKickOutFlow.emit(response)}"
+                    )
+
                 }
 
                 "NtUserLeavedParty" -> {
                     val response = Gson().fromJson(data, NtUserLeavedPartyResponse::class.java)
-                    coroutineScope.launch {
-                        val currentList = _ntUserLeaveFlow.value.toMutableList()
-                        currentList.add(response)
-                        _ntUserLeaveFlow.emit(currentList)
-                        Log.d(
-                            "ChatViewModel",
-                            "kickOutResponse NtUserLeavedParty: ${_ntUserLeaveFlow.value}"
-                        )
+                    _ntUserLeaveFlow.emit(response)
+                    Log.d(
+                        "ChatViewModel",
+                        "kickOutResponse NtUserLeavedParty: ${_ntUserLeaveFlow.emit(response)}"
+                    )
+                }
 
-                    }
+                else -> {
+                    Log.d("Socket Response", "Unsupported command: $cmd")
+                }
+
+            }
+        }
+    }
+
+
+
+
+    //1:1 채팅 삭제
+    private fun deleteOneOnOneResponse(data: String) {
+        viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
+            Log.e("ChatViewModel", "Error: ${throwable.localizedMessage}")
+        }) {
+            Log.d("Socket Response", "Original JSON Response: deleteOneOnOneResponse $data")
+            val jsonData = JSONObject(data)
+            when (val cmd = jsonData.optString("cmd")) {
+                "ReDelete1On1Chat" -> {
+                    val response = Gson().fromJson(data, DeleteOneOnOneResponseData::class.java)
+                    _deleteOneOnOneFlow.emit(response)
+                    Log.d(
+                        "ChatViewModel",
+                        "deleteOneOnOneResponse DeleteOneOnOne: ${_deleteOneOnOneFlow.emit(response)}"
+                    )
                 }
 
                 else -> {

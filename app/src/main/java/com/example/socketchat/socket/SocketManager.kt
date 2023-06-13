@@ -12,7 +12,7 @@ object SocketManager {
             }
         } catch (e: URISyntaxException) {
             e.printStackTrace()
-            throw RuntimeException(e)  // Or handle the error in a better way
+            throw RuntimeException(e)
         }
     }
 }
