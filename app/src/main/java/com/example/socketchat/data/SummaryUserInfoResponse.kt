@@ -2,6 +2,8 @@ package com.example.socketchat.data
 
 import java.io.Serializable
 
+
+
 data class SummaryUserInfoResponse(
     val cmd: String,
     val errInfo: SummaryUserErrInfo,

@@ -6,19 +6,22 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.socketchat.databinding.ActivityMainBinding
-import com.example.socketchat.request.SocketRequestManager
-import com.example.socketchat.viewmodel.ChatViewModel
+import com.example.socketchat.socket.SocketDataRepository
+import com.example.socketchat.socket.SocketManager
+import com.example.socketchat.viewmodel.MainViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: ChatViewModel by viewModels()
-    private val socketRequestManager: SocketRequestManager by lazy { SocketRequestManager() }
+    private val viewModel: MainViewModel by viewModels()
+    private val socketManager = SocketManager
 
     private lateinit var binding: ActivityMainBinding
+
+    var memNo = String()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,11 +31,14 @@ class MainActivity : AppCompatActivity() {
 
         //SocketRequestManager에 memNo를 넘긴다
         binding.btnMemNo.setOnClickListener {
-            val memNo = binding.editTextMemNo.text.toString().trim()
+            socketManager.connect()
+            viewModel.setupLobby()
+
+            memNo = binding.editTextMemNo.text.toString().trim()
             if (memNo.isEmpty()) {
                 Toast.makeText(this@MainActivity, "회원 번호를 입력하세요", Toast.LENGTH_SHORT).show()
             } else {
-                socketRequestManager.sendAuthRequest(memNo.toInt())
+                setupSocketAndSendAuthRequest()
             }
         }
 
@@ -71,13 +77,33 @@ class MainActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-
-                    else -> {
-                        Toast.makeText(this@MainActivity, "오류입니다.", Toast.LENGTH_SHORT).show()
-                    }
                 }
             }
 
         }
     }
+
+
+    override fun onResume() {
+        super.onResume()
+        setupSocketAndSendAuthRequest()
+    }
+
+    private fun setupSocketAndSendAuthRequest() {
+        lifecycleScope.launch {
+            socketManager.connectStatue.collect {
+                if (it == "연결됨") {
+                    SocketDataRepository.setupParty()
+                    SocketDataRepository.setupLobby()
+                    delay(500)
+                    val memNoInt = memNo.toIntOrNull()
+                    if (memNoInt != null) {
+                        viewModel.sendAuthRequest(memNoInt)
+                    }
+                    binding.editTextMemNo.text.clear()
+                }
+            }
+        }
+    }
+
 }

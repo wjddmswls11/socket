@@ -8,18 +8,18 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.socketchat.MenuActivity
 import com.example.socketchat.adapter.SummaryAdapter
 import com.example.socketchat.databinding.FragmentFriendBinding
-import com.example.socketchat.`object`.KickoutDialog
-import com.example.socketchat.viewmodel.ChatViewModel
-import com.example.socketchat.viewmodel.SummaryViewModel
+import com.example.socketchat.socket.SocketManager
+import com.example.socketchat.viewmodel.MenuApiViewModel
 import kotlinx.coroutines.launch
 
 class FriendFragment : Fragment() {
 
     private lateinit var binding: FragmentFriendBinding
-    private val summaryViewModel: SummaryViewModel by activityViewModels()
-    private val chatViewModel: ChatViewModel by activityViewModels()
+    private val menuApiViewModel: MenuApiViewModel by activityViewModels()
+    private val socketManager = SocketManager
 
 
     override fun onCreateView(
@@ -27,6 +27,14 @@ class FriendFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentFriendBinding.inflate(inflater, container, false)
+
+        binding.btnFriendRight.setOnClickListener {
+            socketManager.disconnect()
+            val activity = requireActivity() as MenuActivity
+            activity.supportFragmentManager.beginTransaction().remove(this).commit()
+            activity.finish()
+        }
+
 
         return binding.root
     }
@@ -38,30 +46,21 @@ class FriendFragment : Fragment() {
         val currentUserNickName = arguments?.getString("currentUserNickName")
         val mainProfileUrl = arguments?.getString("mainProfileUrl")
 
-        summaryViewModel.fetchSummaryUserInfo(currentUserMemNo)
+        menuApiViewModel.fetchSummaryUserInfo(currentUserMemNo)
 
         setRecyclerView(currentUserMemNo, currentUserNickName, mainProfileUrl)
 
 
-        //파티에서 강퇴가 되었을 때
-        viewLifecycleOwner.lifecycleScope.launch {
-            chatViewModel.kickOutFlow.collect { kickOutFlow ->
-                if (kickOutFlow.data.kickoutResult == 0) {
-                    val partyNo = kickOutFlow.data.partyNo
-                    partyNo.let {
-                        KickoutDialog.showKickOutDialog(requireContext(), it, requireActivity())
-                    }
-                }
-            }
-        }
-
     }
+
+
+
         private fun setRecyclerView(
             currentUserMemNo: Int?,
             currentUserNickName: String?,
             mainProfileUrl: String?
         ) {
-            val summaryAdapter = SummaryAdapter()
+            val summaryAdapter = SummaryAdapter(requireActivity() as MenuActivity)
             summaryAdapter.setCurrentUserMemNo(currentUserMemNo ?: 0)
             summaryAdapter.setCurrentUserNickName(currentUserNickName)
             summaryAdapter.setMainProfileUrl(mainProfileUrl)
@@ -74,7 +73,7 @@ class FriendFragment : Fragment() {
 
             //사용자 정보 요청
             viewLifecycleOwner.lifecycleScope.launch {
-                summaryViewModel.summarySharedFlow.collect { responseList ->
+                menuApiViewModel.summarySharedFlow.collect { responseList ->
                     summaryAdapter.setData(responseList)
                 }
             }

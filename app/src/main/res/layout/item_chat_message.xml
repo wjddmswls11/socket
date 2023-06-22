@@ -73,7 +73,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
         <TextView
             android:id="@+id/messageTextView_Read_Right"
             android:layout_width="wrap_content"
@@ -106,12 +105,116 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ctl_Chat_Join"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="@color/gray_dark"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/messageTextView_Chat_NickName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="nickName"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/messageTextView_Ga"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="이 "
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/messageTextView_Chat_NickName"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/messageTextView_Chat_PartyNo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="PartyNo"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/messageTextView_Ga"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/messageTextView_Chat_Remain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="번방 참여를 신청합니다."
+            android:textColor="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/messageTextView_Chat_PartyNo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ctl_Chat_Rejoin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="@color/gray_dark"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/messageTextView_RejoinChat_First"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="50"
+            android:textColor="@color/blue_bottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/messageTextView_RejoinChat_Second"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="번방 : "
+            android:textColor="@color/blue_bottom"
+            app:layout_constraintStart_toEndOf="@+id/messageTextView_RejoinChat_First"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/messageTextView_RejoinCHat_Third"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="기타"
+            android:textColor="@color/blue_bottom"
+            app:layout_constraintStart_toEndOf="@+id/messageTextView_RejoinChat_Second"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/view_Chat_Rejoin"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

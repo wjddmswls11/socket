@@ -20,12 +20,14 @@
             android:exported="false" />
         <activity
             android:name=".MenuActivity"
+            android:launchMode="singleTop"
             android:exported="false" />
         <activity
-            android:name=".ChatSelectActivity"
+            android:name=".OneOnOneChatActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

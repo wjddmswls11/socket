@@ -8,45 +8,11 @@ class SocketRequestManager {
 
     private val socketManager = SocketManager
 
-
-
-    //회원인증
-    fun sendAuthRequest(memNo: Int) {
-        val requestData = JSONObject().apply {
-            put("cmd", "RqAuthUser")
-            put("data", JSONObject().apply {
-                put("memNo", memNo)
-            })
-        }
-
-        Log.d("Socket Request", "Sending RqAuthUser: $requestData")
-        socketManager.socket.emit("Lobby", requestData)
-    }
-
-
-
-    //1:1채팅
-    fun send1On1ChatRequest(msg: String, fromMemNo: Int, toMemNo: Int) {
-        val requestData = JSONObject().apply {
-            put("cmd", "Rq1On1TextChat")
-            put("data", JSONObject().apply {
-                put("textChatInfo", JSONObject().apply {
-                    put("msg", msg)
-                })
-                put("commonRq1On1ChatInfo", JSONObject().apply {
-                    put("replyMsgNo", 0)
-                    put("fromMemNo", fromMemNo)
-                    put("toMemNo", toMemNo)
-                })
-            })
-        }
-        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
-        socketManager.socket.emit("Lobby", requestData)
-
-    }
+    private val eventLobby = "Lobby"
+    private val eventParty = "Party"
 
     //파티입장
-    fun senJoinPartyRequest(partyNo : Int, ownerMemNo : Int, rqMemNo : Int) {
+    fun sendJoinPartyRequest(partyNo : Int, ownerMemNo : Int, rqMemNo : Int) {
         val requestData = JSONObject().apply {
             put("cmd","RqJoinParty")
             put("data", JSONObject().apply {
@@ -56,7 +22,7 @@ class SocketRequestManager {
             })
         }
         Log.d("SocketRequestManager", "Socket Request Data: $requestData")
-        socketManager.socket.emit("Lobby", requestData)
+        socketManager.socket?.emit(eventLobby, requestData)
     }
 
     //파티장 파티참여 수락
@@ -73,40 +39,9 @@ class SocketRequestManager {
             })
         }
         Log.d("SocketRequestManager", "Socket Request Data: $requestData")
-        socketManager.socket.emit("Lobby",requestData)
+        socketManager.socket?.emit(eventLobby, requestData)
     }
 
-    //파티채팅
-    fun sendPartyChat(msg: String, fromMemNo : Int, partyNo : Int){
-        val requestData = JSONObject().apply {
-            put("cmd", "RqPartyTextChat")
-            put("data", JSONObject().apply {
-                put("textChatInfo", JSONObject().apply {
-                    put("msg", msg)
-                })
-                put("commonRqPartyChatInfo", JSONObject().apply {
-                    put("replyMsgNo", 0)
-                    put("fromMemNo", fromMemNo)
-                    put("partyNo", partyNo)
-                })
-            })
-        }
-        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
-        socketManager.socket.emit("Party", requestData)
-    }
-
-    //파티떠나기
-    fun sendLeaveParty(partyNo : Int, memNo : Int) {
-        val requestData = JSONObject().apply {
-            put("cmd", "RqLeaveParty")
-            put("data", JSONObject().apply {
-                put("partyNo", partyNo)
-                put("memNo",memNo)
-            })
-        }
-        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
-        socketManager.socket.emit("Party", requestData)
-    }
 
     //유저강퇴
     fun sendKickOutUser(partyNo : Int, ownerMemNo : Int, kickoutMemNo : Int){
@@ -119,7 +54,7 @@ class SocketRequestManager {
             })
         }
         Log.d("SocketRequestManager", "Socket Request Data: $requestData")
-        socketManager.socket.emit("Party", requestData)
+        socketManager.socket?.emit(eventParty, requestData)
     }
 
     //1:1채팅 삭제
@@ -133,6 +68,6 @@ class SocketRequestManager {
             })
         }
         Log.d("SocketRequestManager", "Socket Request Data: $requestData")
-        socketManager.socket.emit("Lobby", requestData)
+        socketManager.socket?.emit(eventLobby, requestData)
     }
 }

@@ -1,26 +1,20 @@
 package com.example.socketchat.adapter
 
 import android.app.AlertDialog
-import android.content.Context
-import android.content.DialogInterface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.socketchat.R
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.example.socketchat.MenuActivity
 import com.example.socketchat.data.MemberInfo
 import com.example.socketchat.data.Party
-import com.example.socketchat.data.RePartyMemberListResponse
 import com.example.socketchat.databinding.ItemDetailPartyBinding
 import com.example.socketchat.request.SocketRequestManager
-import com.example.socketchat.viewmodel.SummaryViewModel
 
-class DetailPartyAdapter(
-    private val context : Context, ) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
+class DetailPartyAdapter(private val activity : MenuActivity) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
 
     private var detailList : ArrayList<MemberInfo> = arrayListOf()
     private var partyData : Party? = null
@@ -79,7 +73,7 @@ class DetailPartyAdapter(
                     if (partyNo != null && ownerMemNo != null) {
                         Log.d("DetailPartyAdapter", "Sending kick out request - Party No: $partyNo, Owner Mem No: $ownerMemNo, Kickout Mem No: $kickoutMemNo")
 
-                        val alertDialog = AlertDialog.Builder(context)
+                        val alertDialog = AlertDialog.Builder(activity)
                         alertDialog.setMessage("멤버를 강퇴하시겠습니까?")
                             .setPositiveButton("예") { dialog, _ ->
                                 socketRequestManager.sendKickOutUser(partyNo, ownerMemNo, kickoutMemNo)
@@ -95,7 +89,7 @@ class DetailPartyAdapter(
             }
 
 
-            Glide.with(itemView.context)
+            Glide.with(activity)
                 .load(detailMember.mainProfileUrl)
                 .transform(CircleCrop())
                 .into(binding.imgDetailPartyProfile)

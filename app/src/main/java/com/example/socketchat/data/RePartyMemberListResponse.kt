@@ -12,10 +12,11 @@ data class RePartyMemberListResponse(
     val data: List<MemberInfo>
 ) : Parcelable
 
+@Parcelize
 data class ErrInfoMemberList(
     val errNo: Int,
     val errMsg: String
-) : Serializable
+) : Parcelable
 
 @Parcelize
 data class MemberInfo(

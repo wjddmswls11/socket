@@ -16,5 +16,10 @@
         android:icon="@drawable/btn_footer_search"
         android:enabled="true"/>
 
+    <item
+        android:id="@+id/menu3"
+        android:title=""
+        android:icon="@drawable/btn_footer_alarm"
+        android:enabled="true"/>
 
 </menu>

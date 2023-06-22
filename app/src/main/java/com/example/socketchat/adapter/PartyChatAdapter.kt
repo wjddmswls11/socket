@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.example.socketchat.data.Party
+import com.example.socketchat.PartyChatActivity
 import com.example.socketchat.data.PartyChatResponse
 import com.example.socketchat.data.RePartyMemberListResponse
 import com.example.socketchat.databinding.ItemPartyChatSelectBinding
@@ -17,8 +17,8 @@ import java.util.Locale
 
 class PartyChatAdapter(
     private val currentUserMemNo: Int,
-    private val partyData: Party,
-    private val partyMemberList: ArrayList<RePartyMemberListResponse>
+    private val partyMemberList: ArrayList<RePartyMemberListResponse>,
+    private val activity: PartyChatActivity
 ) : RecyclerView.Adapter<PartyChatAdapter.PartyChatHolder>() {
 
     private val partyChatList: ArrayList<PartyChatResponse> = arrayListOf()
@@ -28,9 +28,9 @@ class PartyChatAdapter(
         notifyItemInserted(partyChatList.size - 1)
     }
 
-    fun addPartyChatDataAtFront(newData: PartyChatResponse) {
-        partyChatList.add(0, newData)
-        notifyItemInserted(0)
+    fun addPartyChatDataAtFront(newData: List<PartyChatResponse>) {
+        partyChatList.addAll(0, newData)
+        notifyItemRangeInserted(0, newData.size)
     }
 
     private fun convertTimestampToTime(timestamp: Long): String {
@@ -43,7 +43,6 @@ class PartyChatAdapter(
 
     init {
         Log.d("PartyChatAdapter", "currentUserMemNo: $currentUserMemNo")
-        Log.d("PartyChatAdapter", "partyData: $partyData")
     }
 
 
@@ -90,33 +89,31 @@ class PartyChatAdapter(
                 }
             }
 
-            Glide.with(binding.root)
+            Glide.with(activity)
                 .load(memberProfileUrl)
                 .transform(CircleCrop())
                 .into(binding.imgPartyChatAnother)
 
             binding.txtPartyChatNameLeft.text = memberNickName
 
-            if (fromMemNo != -1) {
-                if (ntUserJoinedPartyResponse?.data?.commonRePartyChatInfo?.fromMemNo == currentUserMemNo) {
-                    binding.ctlPartyChatRight.visibility = View.VISIBLE
-                    binding.ctlPartyChatLeft.visibility = View.GONE
-                    binding.messageTextViewPartyRight.text = message
-                    binding.messageTextViewTimeRight.text = time
-                } else {
-                    binding.ctlPartyChatLeft.visibility = View.VISIBLE
-                    binding.ctlPartyChatRight.visibility = View.GONE
-                    binding.messageTextViewPartyLeft.text = message
-                    binding.messageTextViewTimeLeft.text = time
-                }
-
-            } else {
+            if (ntUserJoinedPartyResponse?.data?.commonRePartyChatInfo?.fromMemNo == currentUserMemNo && ntUserJoinedPartyResponse.cmd == "RePartyTextChat") {
+                binding.ctlPartyChatRight.visibility = View.VISIBLE
+                binding.ctlPartyChatLeft.visibility = View.GONE
+                binding.ctlPartyChatJoined.visibility = View.GONE
+                binding.messageTextViewPartyRight.text = message
+                binding.messageTextViewTimeRight.text = time
+            } else if (ntUserJoinedPartyResponse?.cmd == "NtPartyTextChat") {
+                binding.ctlPartyChatLeft.visibility = View.VISIBLE
+                binding.ctlPartyChatRight.visibility = View.GONE
+                binding.ctlPartyChatJoined.visibility = View.GONE
+                binding.messageTextViewPartyLeft.text = message
+                binding.messageTextViewTimeLeft.text = time
+            } else if(ntUserJoinedPartyResponse?.cmd == "NtUserJoinedParty") {
+                binding.ctlPartyChatJoined.visibility = View.VISIBLE
                 binding.ctlPartyChatRight.visibility = View.GONE
                 binding.ctlPartyChatLeft.visibility = View.GONE
+                binding.txtPartyChatJoinedNickname.text = ntUserJoinedPartyResponse.data.joinUserInfo.nickName
             }
-
-
         }
     }
-
 }

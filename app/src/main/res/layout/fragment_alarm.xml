@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     android:background="@color/gray_bottom"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.FriendFragment">
+    tools:context=".fragment.AlarmFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cls_Summary_first"
+        android:id="@+id/cls_Alarm_first"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/blue_bottom"
@@ -19,37 +19,27 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/img_friend_center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_family_restroom_24"
+            android:src="@drawable/baseline_alarm_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
-
-
-        <Button
-            android:id="@+id/btn_friend_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="로그아웃"
-            android:backgroundTint="@color/gray_bottom"
-            android:textColor="@color/blue_bottom"
-            app:layout_constraintStart_toEndOf="@+id/img_friend_center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/summary_rcl_001"
+        android:id="@+id/alarm_Rcl_001"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cls_Summary_first" />
+        app:layout_constraintTop_toBottomOf="@+id/cls_Alarm_first"/>
+
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,7 @@
 package com.example.socketchat.data
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
 
 data class NtUserJoinedPartyResponse(
@@ -19,9 +21,10 @@ data class UserJoinedPartyDataJoin(
     val joinUserInfo: JoinUserInfoJoin
 )
 
+@Parcelize
 data class JoinUserInfoJoin(
     val memNo: Int,
     val nickName: String,
     val mainProfileUrl: String
-)
+) : Parcelable
 

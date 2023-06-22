@@ -14,13 +14,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.socketchat.R
 import com.example.socketchat.databinding.FragmentCreateCustomDialogBinding
-import com.example.socketchat.viewmodel.SummaryViewModel
+import com.example.socketchat.viewmodel.MenuApiViewModel
 import kotlinx.coroutines.launch
 
 class CreatePartyDialogFragment : DialogFragment() {
 
     private lateinit var binding: FragmentCreateCustomDialogBinding
-    private val summaryViewModel: SummaryViewModel by activityViewModels()
+    private val menuApiViewModel: MenuApiViewModel by activityViewModels()
     private lateinit var partyListFragment: PartyListFragment
 
     override fun onCreateView(
@@ -67,8 +67,8 @@ class CreatePartyDialogFragment : DialogFragment() {
 
 
             lifecycleScope.launch {
-                summaryViewModel.viewModelScope.launch {
-                    summaryViewModel.fetchCreatePartyContext(memNo, mainPhotoUrl, title, maxMemberCount, isAutoJoin, questContent)
+                menuApiViewModel.viewModelScope.launch {
+                    menuApiViewModel.fetchCreatePartyContext(memNo, mainPhotoUrl, title, maxMemberCount, isAutoJoin, questContent)
                     Log.d("CreatePartyDialogFragment", "After setCreateRoomRequest")
                 }
             }

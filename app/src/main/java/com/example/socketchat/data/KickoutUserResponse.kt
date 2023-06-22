@@ -18,10 +18,18 @@ data class ErrInfoKickOut(
 
 @Parcelize
 data class RqKickOutUserData(
-    val msgNo: Long,
-    val remainReadCount: Int,
-    val partyNo: Int,
     val ownerMemNo: Int,
     val kickoutMemNo: Int,
-    val kickoutResult: Int
+    val kickoutResult: Int,
+    val commonRePartyChatInfo: CommonKickoutUser
 )  : Parcelable
+
+@Parcelize
+data class CommonKickoutUser(
+    val msgNo: Long,
+    val replyMsgNo: Int,
+    val remainReadCount: Int,
+    val isDeleted: Boolean,
+    val fromMemNo: Int,
+    val partyNo: Int
+) : Parcelable

@@ -5,4 +5,5 @@
     <color name="blue_top">#00b5c2</color>
     <color name="blue_bottom">#003438</color>
     <color name="gray_bottom">#eaeaea</color>
+    <color name="gray_dark">#808080</color>
 </resources>

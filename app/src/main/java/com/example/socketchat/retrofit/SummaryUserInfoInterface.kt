@@ -13,7 +13,6 @@ import com.example.socketchat.data.PartyChatLogData
 import com.example.socketchat.data.PartyMemberListRequest
 import com.example.socketchat.data.Re1On1ChatLog
 import com.example.socketchat.data.RePartyChatLog
-//import com.example.socketchat.data.Re1On1ChatLog
 import com.example.socketchat.data.RePartyMemberListResponse
 import com.example.socketchat.data.SummaryPartyData
 import com.example.socketchat.data.SummaryPartyResponse

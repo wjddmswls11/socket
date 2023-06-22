@@ -1,17 +1,17 @@
 package com.example.socketchat.data
 
-data class DestroyPartyResponse(
+data class NtDestroyPartyResponse(
     val cmd: String,
-    val errInfo: ErrInfoDestroyParty,
-    val data: NtDestroyPartyData
+    val errInfo: ErrInfoNtDestroyParty,
+    val data: DestroyPartyData
 )
 
-data class ErrInfoDestroyParty(
+data class ErrInfoNtDestroyParty(
     val errNo: Int,
     val errMsg: String
 )
 
-data class NtDestroyPartyData(
+data class DestroyPartyData(
     val msgNo: Long,
     val remainReadCount: Int,
     val partyNo: Int

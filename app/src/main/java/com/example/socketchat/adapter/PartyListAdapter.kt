@@ -2,7 +2,6 @@ package com.example.socketchat.adapter
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +12,9 @@ import com.example.socketchat.data.Party
 import com.example.socketchat.data.ReJoinPartyResponse
 import com.example.socketchat.databinding.ItemPartyListBinding
 import com.example.socketchat.fragment.DialogDetailPartyFragment
-import com.example.socketchat.viewmodel.SummaryViewModel
+import com.example.socketchat.viewmodel.MenuApiViewModel
 
-class PartyListAdapter(private val fragmentActivity : FragmentActivity, private val currentUserMemNo: Int, private val summaryViewModel: SummaryViewModel) :
+class PartyListAdapter(private val fragmentActivity : FragmentActivity, private val currentUserMemNo: Int, private val menuApiViewModel: MenuApiViewModel) :
     RecyclerView.Adapter<PartyListAdapter.PartyViewHolder>() {
 
     private var partyList: ArrayList<Party> = arrayListOf()
@@ -49,7 +48,7 @@ class PartyListAdapter(private val fragmentActivity : FragmentActivity, private 
         holder.itemView.setOnClickListener {
             val dialogFragment = DialogDetailPartyFragment()
             val arguments = Bundle().apply {
-                putSerializable("partyData", party)
+                putParcelable("partyData", party)
                 putInt("currentUserMemNo", currentUserMemNo)
             }
             dialogFragment.arguments = arguments
@@ -66,7 +65,7 @@ class PartyListAdapter(private val fragmentActivity : FragmentActivity, private 
                     val partyNo = party.partyNo
                     val ownerMemNo = party.memNo
 
-                    summaryViewModel.fetchDestroyParty(partyNo, ownerMemNo)
+                    menuApiViewModel.fetchDestroyParty(partyNo, ownerMemNo)
                 }
                 .setNegativeButton("아니오") { _, _ ->
                     // 아무 작업도 수행하지 않음

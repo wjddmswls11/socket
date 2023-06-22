@@ -7,30 +7,26 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.socketchat.adapter.PartyListAdapter
-import com.example.socketchat.data.NtRequestJoinPartyResponse
-import com.example.socketchat.data.Party
 import com.example.socketchat.data.ReJoinPartyResponse
 import com.example.socketchat.data.ReJoinPartyResponseData
 import com.example.socketchat.databinding.FragmentPartyListBinding
-import com.example.socketchat.`object`.KickoutDialog
-import com.example.socketchat.request.SocketRequestManager
-import com.example.socketchat.viewmodel.ChatViewModel
-import com.example.socketchat.viewmodel.SummaryViewModel
+import com.example.socketchat.socket.SocketDataRepository
+import com.example.socketchat.viewmodel.MenuApiViewModel
+import com.example.socketchat.viewmodel.MenuViewModel
 import kotlinx.coroutines.launch
 
 
 class PartyListFragment : Fragment() {
     private lateinit var binding: FragmentPartyListBinding
-    private val summaryViewModel: SummaryViewModel by activityViewModels()
-    private val chatViewModel: ChatViewModel by activityViewModels()
-    private val socketRequestManager: SocketRequestManager by lazy { SocketRequestManager() }
+    private val menuViewModel: MenuViewModel by activityViewModels()
+    private val menuApiViewModel: MenuApiViewModel by activityViewModels()
     private lateinit var partyListAdapter: PartyListAdapter
 
-    private var ntJoinPartyFlow: NtRequestJoinPartyResponse? = null
     private var joinPartyFlow: ReJoinPartyResponse? = null
 
     override fun onCreateView(
@@ -52,18 +48,22 @@ class PartyListFragment : Fragment() {
 
         //새로고침
         binding.imgPartyChatListRight.setOnClickListener {
-            summaryViewModel.fetchSummaryPartyList()
+            menuApiViewModel.fetchSummaryPartyList()
         }
 
 
-        summaryViewModel.fetchSummaryPartyList()
+        menuApiViewModel.fetchSummaryPartyList()
 
         partyListAdapter =
-            PartyListAdapter(requireActivity(), arguments?.getInt("currentUserMemNo", -1) ?: -1, summaryViewModel)
+            PartyListAdapter(
+                requireActivity(),
+                arguments?.getInt("currentUserMemNo", -1) ?: -1,
+                menuApiViewModel
+            )
 
         //방정보 요청
         viewLifecycleOwner.lifecycleScope.launch {
-            summaryViewModel.summaryListSharedFlow.collect { partyList ->
+            menuApiViewModel.summaryListSharedFlow.collect { partyList ->
                 partyListAdapter.setData(ArrayList(partyList))
                 partyListAdapter.notifyDataSetChanged()
                 Log.d("PartyListFragment", "summaryListSharedFlow changed: $partyList")
@@ -71,19 +71,21 @@ class PartyListFragment : Fragment() {
         }
 
 
-
-
         //파티입장
         viewLifecycleOwner.lifecycleScope.launch {
-            chatViewModel.joinPartyFlow.collect { joinPartyResponse ->
+            SocketDataRepository.joinPartyFlow.collect { joinPartyResponse ->
                 partyListAdapter.updateJoinPartyResponses(joinPartyResponse)
 
             }
         }
 
+
+
+
+
         binding.rclPartyList.adapter = partyListAdapter
         binding.rclPartyList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
 
 
 
@@ -93,34 +95,10 @@ class PartyListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //파티입장의 값이 변경되었을 때(나에게 요청이 왔을 때)
-        viewLifecycleOwner.lifecycleScope.launch {
-            chatViewModel.ntJoinPartyFlow.collect { ntJoinFlowValue ->
-                ntJoinPartyFlow = ntJoinFlowValue
-                // joinPartyFlow의 값이 변경되었을 때 수행할 작업을 여기에 작성합니다.
-                Log.d("1 PartyListFragment", "joinPartyFlow: $ntJoinPartyFlow")
-
-                //방에 있는 멤버의 정보를 요청함
-                val partyNo = ntJoinPartyFlow?.data?.summaryPartyInfo?.partyNo
-                val ownerMemNo = ntJoinPartyFlow?.data?.summaryPartyInfo?.memNo
-                Log.d("2 PartyListFragment", "partyNo: $partyNo, memNo: $ownerMemNo")
-                if (partyNo != null && ownerMemNo != null) {
-                    summaryViewModel.fetchPartyMember(partyNo, ownerMemNo)
-                }
-                Log.d("3 PartyListFragment", "ntJoinPartyFlow : $ntJoinPartyFlow")
-
-                val rqMemNo = ntJoinFlowValue.data.rqUserInfo.memNo
-                val nickName = ntJoinFlowValue.data.rqUserInfo.nickName
-
-                if (partyNo != null && ownerMemNo != null) {
-                    showAcceptPartyDialog(partyNo, ownerMemNo, rqMemNo, nickName)
-                }
-            }
-        }
 
         //파티입장의 값이 변경되었을 때(내가 요청을 보냈을 때)
         viewLifecycleOwner.lifecycleScope.launch {
-            chatViewModel.joinPartyFlow.collect { flowValue ->
+            SocketDataRepository.joinPartyFlow.collect { flowValue ->
                 joinPartyFlow = flowValue
                 // joinPartyFlow의 값이 변경되었을 때 수행할 작업을 여기에 작성합니다.
                 Log.d("PartyListFragment", "joinPartyFlow: $joinPartyFlow")
@@ -133,57 +111,63 @@ class PartyListFragment : Fragment() {
 
         //파티에서 강퇴가 되었을 때
         viewLifecycleOwner.lifecycleScope.launch {
-            chatViewModel.kickOutFlow.collect { kickOutFlow ->
-                if (kickOutFlow.data.kickoutResult == 0){
-                    KickoutDialog.showKickOutDialog(requireContext(), kickOutFlow.data.partyNo, requireActivity())
+            SocketDataRepository.kickOutFlow.collect { kickOutFlow ->
+                if (kickOutFlow.data.kickoutResult == 0) {
+                    val partyNo = kickOutFlow.data.commonRePartyChatInfo.partyNo
+                    showKickOutDialog(partyNo)
                 }
+                menuApiViewModel.fetchSummaryPartyList()
             }
         }
 
         //파티가입을 승인했을 때 새로고침이 될 수 있도록
         viewLifecycleOwner.lifecycleScope.launch {
-            chatViewModel.ntUserJoinedPartyFlow.collect {ntUserJoinedPartyFlow ->
-                if (ntUserJoinedPartyFlow.errInfo.errNo == 0) {
-                    summaryViewModel.fetchSummaryPartyList()
+            menuViewModel.ntUserJoinedPartyFlow.collect { ntUserJoinedPartyFlow ->
+                val lastNtUserJoinedPartyFlow = ntUserJoinedPartyFlow.lastOrNull()
+                if (lastNtUserJoinedPartyFlow?.errInfo?.errNo == 0) {
+                    Log.d("파티 새로고침1", "$ntUserJoinedPartyFlow")
+                    menuApiViewModel.fetchSummaryPartyList()
                 }
             }
         }
 
 
-    }
-
-
-
-
-
-    //파티가입을 받았을 때
-    private fun showAcceptPartyDialog(
-        partyNo: Int,
-        ownerMemNo: Int,
-        rqMemNo: Int,
-        nickName: String
-    ) {
-        val message = "$nickName 가 $partyNo 번방 참여를 신청합니다"
-
-        val dialogBuilder = AlertDialog.Builder(requireContext())
-        dialogBuilder.setMessage(message)
-            .setPositiveButton("수락") { _, _ ->
-                // 파티 참여 승락 처리를 진행하세요.
-                socketRequestManager.sendAcceptParty(partyNo, true, ownerMemNo, rqMemNo)
+        //파티가 사라졌을 때 토스트 메세지가 나올 수 있도록
+        viewLifecycleOwner.lifecycleScope.launch {
+            SocketDataRepository.destroyPartyFlow.collect { destroyPartyFlow ->
+                val partyNo = destroyPartyFlow.data.partyNo
+                val message = "파티 $partyNo 가 삭제되었습니다."
+                Log.d("파티 삭제", message)
+                Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
+                menuApiViewModel.fetchSummaryPartyList()
             }
-            .setNegativeButton("거절") { _, _ ->
-                // 파티 참여 거절 처리를 진행하세요.
-                socketRequestManager.sendAcceptParty(partyNo, false, ownerMemNo, rqMemNo)
+        }
+
+
+        //내가 파티를 떠났을 떄
+        viewLifecycleOwner.lifecycleScope.launch {
+            SocketDataRepository.leavePartyFlow.collect {
+                menuApiViewModel.fetchSummaryPartyList()
             }
-            .create()
-            .show()
+        }
+
+        //누군가 파티를 떠났을 때
+        viewLifecycleOwner.lifecycleScope.launch {
+            SocketDataRepository.ntUserLeaveFlow.collect { ntLeavePartyFlow ->
+                val partyNo = ntLeavePartyFlow.data.partyNo
+                val memNo = ntLeavePartyFlow.data.memNo
+                val message = "$partyNo 번 방에서 $memNo 가 나갔습니다."
+                Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
+                menuApiViewModel.fetchSummaryPartyList()
+            }
+        }
     }
 
 
     //파티가입을 신청했을 때 denyReason에 따라서 보이는 글이 다르게
     private fun showDenyReasonDialog(reJoinPartyResponseData: ReJoinPartyResponseData) {
         val message = when (reJoinPartyResponseData.commonRe1On1ChatInfo.replyMsgNo) {
-            0 -> "참여되었습니다"
+            0 -> "신청되었습니다"
             1 -> "방장이 거절했습니다."
             2 -> "빈방이 없습니다."
             3 -> "방이 꽉 찼습니다."
@@ -200,5 +184,16 @@ class PartyListFragment : Fragment() {
             }
             .create()
             .show()
+    }
+
+    //파티에서 강퇴를 당했을 떄
+    private fun showKickOutDialog(partyNo: Int) {
+        val dialogBuilder = AlertDialog.Builder(context)
+            .setMessage("당신은 $partyNo 번 방에서 강퇴되었습니다.")
+            .setPositiveButton("확인") { dialog, _ ->
+                dialog.dismiss()
+            }
+        val kickOutDialog = dialogBuilder.create()
+        kickOutDialog.show()
     }
 }
