@@ -12,7 +12,7 @@ import java.lang.Exception
 import java.net.URISyntaxException
 
 object SocketManager {
-    private const val SOCKET_URL = "http://61.80.148.23:3001/"
+    private const val SOCKET_URL = "http://000000000"
     private val socketConnectStatue = MutableStateFlow("연결중")
     val connectStatue = socketConnectStatue.asStateFlow()
     var socket: Socket? = null
