@@ -144,12 +144,6 @@ class ChatListAdapter(
                 binding.viewChatRejoin.visibility = View.GONE
                 binding.messageTextViewChatNickName.text = oneOnOneChatData.data.rqUserInfo.nickName
                 binding.messageTextViewChatPartyNo.text = oneOnOneChatData.data.summaryPartyInfo.partyNo.toString()
-            } else if (oneOnOneChatData?.cmd == "ReJoinPartyResult") {
-                binding.viewChatRejoin.visibility = View.VISIBLE
-                binding.ctlChatJoin.visibility = View.GONE
-                binding.ctlChatRejoin.visibility = View.GONE
-                binding.ctlChatLeft.visibility = View.GONE
-                binding.ctlChatRight.visibility = View.GONE
             }
 
             //숫자에 따라 다른 텍스트 표시

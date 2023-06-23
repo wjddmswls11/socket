@@ -133,7 +133,8 @@ class OneOnOneChatActivity : AppCompatActivity() {
                     }
 
                     if (!isEndOfData) {
-                        val reversedChatList = i.data.reversed()
+                        val chatList = i.data.filterNot { it.cmd == "ReJoinPartyResult"}
+                        val reversedChatList = chatList.reversed()
                         chatListAdapter.addChatDataAtFront(reversedChatList)
                     }
                 }

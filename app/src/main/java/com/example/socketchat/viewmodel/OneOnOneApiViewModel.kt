@@ -29,7 +29,7 @@ class OneOnOneApiViewModel : ViewModel() {
                 fromMemNo = fromMemNo,
                 toMemNo = toMemNo,
                 lastMsgNo = lastMsgNo,
-                countPerPage = 20,
+                countPerPage = 30,
                 sortType = sortType
             )
             Log.d("1:1 채팅 로그", "OneOnOneChat Request: $request")
