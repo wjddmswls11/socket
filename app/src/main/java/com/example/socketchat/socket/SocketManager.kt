@@ -43,11 +43,11 @@ object SocketManager {
         socket?.on(Socket.EVENT_DISCONNECT) {
             socketConnectStatue.value = "연결해제"
             reconnectIfNeeded()
-            Log.d("yunje", "${connectStatue.value}")
+            Log.d("yunje", socketConnectStatue.value)
         }
         socket?.on(Socket.EVENT_CONNECT) {
             socketConnectStatue.value = "연결됨"
-            Log.d("yunje", "${SocketManager.connectStatue.value}")
+            Log.d("yunje",  socketConnectStatue.value)
         }
         socket?.on(Socket.EVENT_RECONNECT_ATTEMPT) {
             socketConnectStatue.value = "연결시도"
@@ -55,11 +55,11 @@ object SocketManager {
         }
         socket?.on(Socket.EVENT_RECONNECTING) {
             socketConnectStatue.value = "재연결됨"
-            Log.d("yunje", "${connectStatue.value}")
+            Log.d("yunje", socketConnectStatue.value)
         }
         socket?.on(Socket.EVENT_RECONNECT_ERROR) {
             socketConnectStatue.value = "재연결에러"
-            Log.d("yunje", "${connectStatue.value}")
+            Log.d("yunje", socketConnectStatue.value)
         }
 
 

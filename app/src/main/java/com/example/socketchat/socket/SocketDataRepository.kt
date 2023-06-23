@@ -4,7 +4,6 @@ import android.util.Log
 import com.example.socketchat.data.KickoutUserResponse
 import com.example.socketchat.data.NtDestroyPartyResponse
 import com.example.socketchat.data.NtRequestJoinPartyResponse
-import com.example.socketchat.data.NtUserLeavedPartyChatResponse
 import com.example.socketchat.data.NtUserLeavedPartyResponse
 import com.example.socketchat.data.ReJoinPartyResponse
 import com.example.socketchat.data.ReJoinPartyResultResponse

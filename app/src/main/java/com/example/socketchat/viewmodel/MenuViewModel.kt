@@ -50,7 +50,6 @@ class MenuViewModel : ViewModel() {
         }) {
             Log.d("수락 Socket Response", "Original JSON Response: acceptPartyResponse $data")
             val jsonData = JSONObject(data)
-
             when (val cmd = jsonData.optString("cmd")) {
 
                 //파티장 파티참여 수락, 방 생성
