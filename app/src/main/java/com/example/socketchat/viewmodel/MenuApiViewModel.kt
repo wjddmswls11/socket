@@ -61,29 +61,6 @@ class MenuApiViewModel : ViewModel(){
     val partyMemberList: SharedFlow<ArrayList<RePartyMemberListResponse>>
         get() = _partyMemberList
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //사용자 정보 요청
     fun fetchSummaryUserInfo(currentUserMemNo: Int?) {
         viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
@@ -130,7 +107,7 @@ class MenuApiViewModel : ViewModel(){
 
             val summaryPartyInfo = SummaryPartyInfo(
                 memNo = memNo,
-                mainPhotoUrl = if (mainPhotoUrl.isBlank()) defaultPhotoUrl else mainPhotoUrl,
+                mainPhotoUrl = mainPhotoUrl.ifBlank { defaultPhotoUrl },
                 title = title,
                 location = "서구 마륵동",
                 maxMemberCount = maxMemberCount,

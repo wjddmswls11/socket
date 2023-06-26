@@ -32,7 +32,6 @@ class OneOnOneChatActivity : AppCompatActivity() {
     //첫 실행인지 아닌지 판단하는 변수
     private var isFirstLaunch: Boolean = true
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

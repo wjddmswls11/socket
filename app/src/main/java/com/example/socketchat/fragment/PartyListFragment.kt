@@ -79,14 +79,11 @@ class PartyListFragment : Fragment() {
             }
         }
 
-
-
-
-
-        binding.rclPartyList.adapter = partyListAdapter
-        binding.rclPartyList.layoutManager =
-            LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
-
+        binding.rclPartyList.apply {
+            adapter = partyListAdapter
+            layoutManager =
+                LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        }
 
 
         return binding.root

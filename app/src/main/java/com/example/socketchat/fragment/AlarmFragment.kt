@@ -33,9 +33,11 @@ class AlarmFragment : Fragment() {
             }
         }
 
-        binding.alarmRcl001.adapter = alarmAdapter
-        binding.alarmRcl001.layoutManager =
-            LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        binding.alarmRcl001.apply {
+            adapter = alarmAdapter
+            layoutManager =
+                LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        }
 
         return binding.root
     }
