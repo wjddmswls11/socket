@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object NetworkManager {
-    private const val BASE_URL = "http://0000000000"
+    private const val BASE_URL = "http://61.80.148.23:3000"
 
     fun retrofit(): SummaryUserInfoInterface {
         return Retrofit.Builder()
