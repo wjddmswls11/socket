@@ -33,7 +33,7 @@ data class OneOnOneDataData(
     val commonRe1On1ChatInfo: CommonChatInfo,
     val isAccept : Boolean,
     val denyReason : Int,
-    val rqJoinParty : JoinPartyNt1On1TextChat,
+    val rqJoinParty : JoinPartyNt1On1TextChat?,
     val summaryPartyInfo : SummaryPartyInfoNt1On1TextChat,
     val rqUserInfo: RqUserInfoNt1On1TextChat
 ) : Serializable

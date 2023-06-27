@@ -19,6 +19,43 @@ class MenuViewModel : ViewModel() {
     private val socketManager = SocketManager
 
 
+
+    //파티장 파티참여 수락
+    fun sendAcceptParty(partyNo : Int, isAccept: Boolean, ownerMemNo: Int, rqMemNo: Int) {
+        val requestData = JSONObject().apply {
+            put("cmd","RqAcceptParty")
+            put("data",JSONObject().apply {
+                put("isAccept", isAccept)
+                put("rqJoinParty", JSONObject().apply {
+                    put("partyNo", partyNo)
+                    put("ownerMemNo", ownerMemNo)
+                    put("rqMemNo", rqMemNo)
+                })
+            })
+        }
+        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
+        socketManager.socket?.emit("Lobby", requestData)
+    }
+
+
+    //유저강퇴
+    fun sendKickOutUser(partyNo : Int, ownerMemNo : Int, kickoutMemNo : Int){
+        val requestData = JSONObject().apply {
+            put("cmd","RqKickoutUser")
+            put("data", JSONObject().apply {
+                put("partyNo", partyNo)
+                put("ownerMemNo", ownerMemNo)
+                put("kickoutMemNo", kickoutMemNo)
+            })
+        }
+        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
+        socketManager.socket?.emit("Party", requestData)
+    }
+
+
+
+
+
     //파티장 파티참여 수락
     private val _ntUserJoinedPartyFlow =
         MutableStateFlow<List<NtUserJoinedPartyResponse>>(emptyList())

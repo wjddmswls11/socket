@@ -12,15 +12,13 @@ import com.example.socketchat.MenuActivity
 import com.example.socketchat.data.MemberInfo
 import com.example.socketchat.data.Party
 import com.example.socketchat.databinding.ItemDetailPartyBinding
-import com.example.socketchat.request.SocketRequestManager
+import com.example.socketchat.viewmodel.MenuViewModel
 
-class DetailPartyAdapter(private val activity : MenuActivity) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
+class DetailPartyAdapter(private val activity : MenuActivity, private val menuViewModel : MenuViewModel) : RecyclerView.Adapter<DetailPartyAdapter.DetailViewHolder>(){
 
     private var detailList : ArrayList<MemberInfo> = arrayListOf()
     private var partyData : Party? = null
     private var currentUserMemNo: Int = -1
-    private val socketRequestManager = SocketRequestManager()
-
     fun setData(newData : ArrayList<MemberInfo>){
         detailList.clear()
         detailList.addAll(newData)
@@ -76,7 +74,7 @@ class DetailPartyAdapter(private val activity : MenuActivity) : RecyclerView.Ada
                         val alertDialog = AlertDialog.Builder(activity)
                         alertDialog.setMessage("멤버를 강퇴하시겠습니까?")
                             .setPositiveButton("예") { dialog, _ ->
-                                socketRequestManager.sendKickOutUser(partyNo, ownerMemNo, kickoutMemNo)
+                                menuViewModel.sendKickOutUser(partyNo, ownerMemNo, kickoutMemNo)
                                 dialog.dismiss()
                             }
                             .setNegativeButton("취소"){ dialog, _ ->

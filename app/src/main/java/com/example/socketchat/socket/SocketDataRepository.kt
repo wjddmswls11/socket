@@ -24,7 +24,6 @@ object SocketDataRepository {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private val socketManager = SocketManager
 
-
     //파티떠나기
     fun sendLeaveParty(partyNo: Int, memNo: Int) {
         val requestData = JSONObject().apply {
@@ -37,6 +36,24 @@ object SocketDataRepository {
         Log.d("SocketRequestManager", "Socket Request Data: $requestData")
         socketManager.socket?.emit("Party", requestData)
     }
+
+
+    //파티입장
+    fun sendJoinPartyRequest(partyNo : Int, ownerMemNo : Int, rqMemNo : Int) {
+        val requestData = JSONObject().apply {
+            put("cmd","RqJoinParty")
+            put("data", JSONObject().apply {
+                put("partyNo", partyNo)
+                put("ownerMemNo", ownerMemNo)
+                put("rqMemNo", rqMemNo)
+            })
+        }
+        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
+        socketManager.socket?.emit("Lobby", requestData)
+    }
+
+
+
 
     //파티삭제
     private val privateDestroyPartyFlow = MutableSharedFlow<NtDestroyPartyResponse>()

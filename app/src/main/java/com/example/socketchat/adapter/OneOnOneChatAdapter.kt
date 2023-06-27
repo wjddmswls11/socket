@@ -12,12 +12,12 @@ import com.example.socketchat.databinding.ItemOneononechatLeftBinding
 import com.example.socketchat.databinding.ItemOneononechatRightBinding
 import com.example.socketchat.databinding.ItemOneononechatjoinBinding
 import com.example.socketchat.databinding.ItemOneononechatrejoinBinding
-import com.example.socketchat.request.SocketRequestManager
+import com.example.socketchat.viewmodel.OneOnOneViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class OneOnOneChatAdapter(
-    private val currentUserMemNo: Int,
+    private val currentUserMemNo: Int, private val oneOnOneViewModel: OneOnOneViewModel
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -28,7 +28,6 @@ class OneOnOneChatAdapter(
     }
 
     private val oneOnOneChatList: ArrayList<Nt1On1TextChat> = arrayListOf()
-    private val socketRequestManager = SocketRequestManager()
 
 
     //삭제된 채팅 메시지를 처리하는 함수
@@ -37,6 +36,7 @@ class OneOnOneChatAdapter(
             oneOnOneChatList.indexOfFirst { it.data.commonRe1On1ChatInfo.msgNo == deleteChat }
         if (position != -1) {
             val chatItem = oneOnOneChatList[position]
+
             //현재 시간에서 채팅 메시지의 msgNo(시간)을 뺀 값을 분 단위로 계산합니다.
             val timeDifferenceMinutes =
                 (System.currentTimeMillis() - chatItem.data.commonRe1On1ChatInfo.msgNo) / 60000
@@ -50,6 +50,7 @@ class OneOnOneChatAdapter(
                 val newChatItem = chatItem.copy(data = newData)
                 oneOnOneChatList[position] = newChatItem
                 notifyItemChanged(position)
+
             }
         }
     }
@@ -84,18 +85,22 @@ class OneOnOneChatAdapter(
                 val binding = ItemOneononechatLeftBinding.inflate(inflater, parent, false)
                 OneOnOneChatLeftViewHolder(binding)
             }
+
             VIEW_TYPE_CHAT_RIGHT -> {
                 val binding = ItemOneononechatRightBinding.inflate(inflater, parent, false)
                 OneOnOneChatRightViewHolder(binding)
             }
+
             VIEW_TYPE_CHAT_JOIN -> {
                 val binding = ItemOneononechatjoinBinding.inflate(inflater, parent, false)
                 OneOnOneChatJoinViewHolder(binding)
             }
+
             VIEW_TYPE_CHAT_REJOIN -> {
                 val binding = ItemOneononechatrejoinBinding.inflate(inflater, parent, false)
                 OneOnOneChatReJoinViewHolder(binding)
             }
+
             else -> throw IllegalArgumentException("Invalid view type")
         }
 
@@ -106,15 +111,18 @@ class OneOnOneChatAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val oneOnOne = oneOnOneChatList[position]
-        when (holder) {
-            is OneOnOneChatLeftViewHolder -> holder.bind(oneOnOne)
-            is OneOnOneChatRightViewHolder -> holder.bind(oneOnOne, position)
-            is OneOnOneChatJoinViewHolder -> holder.bind(oneOnOne)
-            is OneOnOneChatReJoinViewHolder -> holder.bind(oneOnOne)
-            else -> throw IllegalArgumentException("Invalid view holder")
+        if (position < oneOnOneChatList.size) {
+            val oneOnOne = oneOnOneChatList[position]
+            when (holder) {
+                is OneOnOneChatLeftViewHolder -> holder.bind(oneOnOne)
+                is OneOnOneChatRightViewHolder -> holder.bind(oneOnOne, position)
+                is OneOnOneChatJoinViewHolder -> holder.bind(oneOnOne)
+                is OneOnOneChatReJoinViewHolder -> holder.bind(oneOnOne)
+                else -> throw IllegalArgumentException("Invalid view holder")
+            }
         }
     }
+
 
     override fun getItemViewType(position: Int): Int {
         val chatData = oneOnOneChatList[position]
@@ -190,7 +198,7 @@ class OneOnOneChatAdapter(
                     AlertDialog.Builder(itemView.context)
                         .setMessage("삭제하시겠습니까?")
                         .setPositiveButton("네") { _, _ ->
-                            socketRequestManager.sendDeleteOneOnOneChat(
+                            oneOnOneViewModel.sendDeleteOneOnOneChat(
                                 delMsgNo,
                                 fromMemNoLongClick,
                                 toMemNo

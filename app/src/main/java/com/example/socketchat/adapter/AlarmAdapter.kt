@@ -8,12 +8,11 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.socketchat.MenuActivity
 import com.example.socketchat.data.NtRequestJoinPartyResponse
 import com.example.socketchat.databinding.ItemAlarmNtrequestBinding
-import com.example.socketchat.request.SocketRequestManager
+import com.example.socketchat.viewmodel.MenuViewModel
 
-class AlarmAdapter(private val activity : MenuActivity) : RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
+class AlarmAdapter(private val activity : MenuActivity, private val menuViewModel : MenuViewModel) : RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
 
     private val alarmList : ArrayList<NtRequestJoinPartyResponse> = arrayListOf()
-    private val socketRequestManager = SocketRequestManager()
 
     fun updateData(newData : List<NtRequestJoinPartyResponse>) {
         alarmList.clear()
@@ -60,7 +59,7 @@ class AlarmAdapter(private val activity : MenuActivity) : RecyclerView.Adapter<A
                 val partyNo = alarmList.data.summaryPartyInfo.partyNo
                 val ownerMemNo = alarmList.data.summaryPartyInfo.memNo
                 val rqMemNo = alarmList.data.rqUserInfo.memNo
-                socketRequestManager.sendAcceptParty(partyNo,true, ownerMemNo, rqMemNo)
+                menuViewModel.sendAcceptParty(partyNo,true, ownerMemNo, rqMemNo)
 
                 //해당 아이템 제거
                 removeItem(bindingAdapterPosition)
@@ -71,7 +70,7 @@ class AlarmAdapter(private val activity : MenuActivity) : RecyclerView.Adapter<A
                 val partyNo = alarmList.data.summaryPartyInfo.partyNo
                 val ownerMemNo = alarmList.data.summaryPartyInfo.memNo
                 val rqMemNo = alarmList.data.rqUserInfo.memNo
-                socketRequestManager.sendAcceptParty(partyNo, false, ownerMemNo, rqMemNo)
+                menuViewModel.sendAcceptParty(partyNo, false, ownerMemNo, rqMemNo)
 
                 // 해당 아이템 제거
                 removeItem(bindingAdapterPosition)

@@ -22,6 +22,7 @@ class OneOnOneChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatSelectBinding
     private val viewModel: OneOnOneViewModel by viewModels()
     private val oneOnOneApiViewModel: OneOnOneApiViewModel by viewModels()
+    private val oneOnOneViewModel : OneOnOneViewModel by viewModels()
 
     private lateinit var chatListAdapter: OneOnOneChatAdapter
 
@@ -51,7 +52,7 @@ class OneOnOneChatActivity : AppCompatActivity() {
         Log.d("ChatSelectActivity", "$summaryData")
 
         chatListAdapter =
-            OneOnOneChatAdapter(currentUserMemNo)  // chatListAdapter 초기화
+            OneOnOneChatAdapter(currentUserMemNo, oneOnOneViewModel)  // chatListAdapter 초기화
 
         // chatListAdapter 설정
         binding.listMessage.adapter = chatListAdapter

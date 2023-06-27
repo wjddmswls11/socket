@@ -20,9 +20,9 @@ import com.example.socketchat.adapter.DetailPartyAdapter
 import com.example.socketchat.data.Party
 import com.example.socketchat.data.RePartyMemberListResponse
 import com.example.socketchat.databinding.FragmentDialogDetailPartyBinding
-import com.example.socketchat.request.SocketRequestManager
 import com.example.socketchat.socket.SocketDataRepository
 import com.example.socketchat.viewmodel.MenuApiViewModel
+import com.example.socketchat.viewmodel.MenuViewModel
 import kotlinx.coroutines.launch
 
 
@@ -30,6 +30,7 @@ class DialogDetailPartyFragment : DialogFragment() {
 
     private lateinit var binding: FragmentDialogDetailPartyBinding
     private val menuApiViewModel: MenuApiViewModel by activityViewModels()
+    private val menuViewModel : MenuViewModel by activityViewModels()
     private lateinit var detailPartyAdapter: DetailPartyAdapter
 
     override fun onCreateView(
@@ -64,7 +65,7 @@ class DialogDetailPartyFragment : DialogFragment() {
 
 
 
-        detailPartyAdapter = DetailPartyAdapter(requireActivity() as MenuActivity)
+        detailPartyAdapter = DetailPartyAdapter(requireActivity() as MenuActivity, menuViewModel)
         detailPartyAdapter.setPartyData(partyData)
         detailPartyAdapter.setCurrentUserMemNo(currentUserMemNo)
         binding.rclDetailParty.layoutManager =
@@ -147,7 +148,7 @@ class DialogDetailPartyFragment : DialogFragment() {
                     binding.dialogDetailJoinParty.setOnClickListener {
                         val partyNoDetail = response.data.summaryPartyInfo.partyNo
                         val ownerMemNoDetail = response.data.summaryPartyInfo.memNo
-                        SocketRequestManager().sendJoinPartyRequest(partyNoDetail, ownerMemNoDetail, currentUserMemNo)
+                        SocketDataRepository.sendJoinPartyRequest(partyNoDetail, ownerMemNoDetail, currentUserMemNo)
 
                         dismiss()
                     }

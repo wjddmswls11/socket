@@ -16,7 +16,6 @@ import org.json.JSONObject
 class OneOnOneViewModel : ViewModel() {
     private val socketManager = SocketManager
 
-
     //1:1채팅
     fun send1On1ChatRequest(msg: String, fromMemNo: Int, toMemNo: Int) {
         val requestData = JSONObject().apply {
@@ -35,6 +34,26 @@ class OneOnOneViewModel : ViewModel() {
         Log.d("SocketRequestManager", "Socket Request Data: $requestData")
         socketManager.socket?.emit("Lobby", requestData)
     }
+
+
+
+    //1:1채팅 삭제
+    fun sendDeleteOneOnOneChat(delMsgNo : Long, fromMemNo : Int, toMemNo : Int) {
+        val requestData = JSONObject().apply {
+            put("cmd","RqDelete1On1Chat")
+            put("data",JSONObject().apply {
+                put("delMsgNo", delMsgNo)
+                put("fromMemNo", fromMemNo)
+                put("toMemNo", toMemNo)
+            })
+        }
+        Log.d("SocketRequestManager", "Socket Request Data: $requestData")
+        socketManager.socket?.emit("Lobby", requestData)
+    }
+
+
+
+
 
 
     //1:1채팅
