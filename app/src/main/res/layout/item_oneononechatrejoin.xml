@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ctl_Chat_Rejoin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_dark"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/messageTextView_RejoinChat_First"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="50"
+            android:textColor="@color/blue_bottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/messageTextView_RejoinChat_Second"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="번방 : "
+            android:textColor="@color/blue_bottom"
+            app:layout_constraintStart_toEndOf="@+id/messageTextView_RejoinChat_First"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/messageTextView_RejoinCHat_Third"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="기타"
+            android:textColor="@color/blue_bottom"
+            app:layout_constraintStart_toEndOf="@+id/messageTextView_RejoinChat_Second"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

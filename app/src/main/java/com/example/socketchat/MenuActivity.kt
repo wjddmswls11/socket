@@ -16,33 +16,28 @@ class MenuActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMenuBinding
     private val viewModel : MenuViewModel by viewModels()
 
-    var currentUserMemNo: Int = -1
-    var currentUserNickName: String = ""
-    var mainProfileUrl: String = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        currentUserMemNo = intent.getIntExtra("MEMNO", -1)
-        currentUserNickName = intent.getStringExtra("NICKNAME") ?: ""
-        mainProfileUrl = intent.getStringExtra("MAINPROFILEURL") ?: ""
+        val currentUserMemNo = intent.getIntExtra("MEMNO", -1)
+        val currentUserNickName = intent.getStringExtra("NICKNAME") ?: ""
+        val mainProfileUrl = intent.getStringExtra("MAINPROFILEURL") ?: ""
 
         viewModel.setupParty()
 
-        initBottomNavigation()
 
         //바텀네비게이션 보라색으로 나오던 것
         binding.mainBtn.itemIconTintList = null
 
-
+        initBottomNavigation(currentUserMemNo, currentUserNickName, mainProfileUrl)
 
     }
 
     //바텀내비 초기 설정
-    private fun initBottomNavigation() {
+    private fun initBottomNavigation(currentUserMemNo : Int, currentUserNickName : String, mainProfileUrl : String) {
         replaceFragment(FriendFragment().apply {
             arguments = bundleOf(
                 "currentUserMemNo" to currentUserMemNo,

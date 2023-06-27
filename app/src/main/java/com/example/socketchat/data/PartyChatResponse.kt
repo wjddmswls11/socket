@@ -34,7 +34,8 @@ data class ErrInfoPartyText(
 data class DataPartyText(
     val textChatInfo: TextChatInfo,
     val commonRePartyChatInfo: CommonRePartyChatInfo,
-    val joinUserInfo: JoinUserInfoJoin
+    val joinUserInfo: JoinUserInfoJoin,
+    val memNo : Int
 ) : Parcelable
 
 @Parcelize

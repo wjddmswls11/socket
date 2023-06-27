@@ -71,7 +71,7 @@ data class RqUserInfoNt1On1TextChat(
 
 data class CommonChatInfo(
     val msgNo: Long,
-    val replyMsgNo: Int,
+    val replyMsgNo: Long,
     val remainReadCount: Int,
     val isDeleted: Boolean,
     val fromMemNo: Int,

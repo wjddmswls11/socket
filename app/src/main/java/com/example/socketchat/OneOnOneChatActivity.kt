@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.example.socketchat.adapter.ChatListAdapter
+import com.example.socketchat.adapter.OneOnOneChatAdapter
 import com.example.socketchat.data.SummaryUserInfoResponse
 import com.example.socketchat.databinding.ActivityChatSelectBinding
 import com.example.socketchat.viewmodel.OneOnOneViewModel
@@ -23,7 +23,7 @@ class OneOnOneChatActivity : AppCompatActivity() {
     private val viewModel: OneOnOneViewModel by viewModels()
     private val oneOnOneApiViewModel: OneOnOneApiViewModel by viewModels()
 
-    private lateinit var chatListAdapter: ChatListAdapter
+    private lateinit var chatListAdapter: OneOnOneChatAdapter
 
     private lateinit var summaryData: SummaryUserInfoResponse
 
@@ -51,7 +51,7 @@ class OneOnOneChatActivity : AppCompatActivity() {
         Log.d("ChatSelectActivity", "$summaryData")
 
         chatListAdapter =
-            ChatListAdapter(currentUserMemNo, summaryData, this)  // chatListAdapter 초기화
+            OneOnOneChatAdapter(currentUserMemNo)  // chatListAdapter 초기화
 
         // chatListAdapter 설정
         binding.listMessage.adapter = chatListAdapter
@@ -110,12 +110,16 @@ class OneOnOneChatActivity : AppCompatActivity() {
 
         // 채팅 로그 요청
         lifecycleScope.launch {
+            Log.d("로그 요청","1111")
             oneOnOneApiViewModel.oneOnOneChatLogFlow.collect { chatDataList ->
+                Log.d("로그 요청","222222")
                 var lastMsgNoPrev: Long
                 var isEndOfData = false
                 // 채팅 로그 요청이 완료된 후에 chatDataList를 설정하고 어댑터에 전달
                 chatDataList.forEach { i ->
+                    Log.d("로그 요청","333333")
                     if (i.data.isNotEmpty()) {
+                        Log.d("로그 요청","4444444")
                         val lastMsgInData = i.data[i.data.size - 1]
                         Log.d("ChatSelectActivity", "i.data size: ${i.data.size}")
 
@@ -132,6 +136,7 @@ class OneOnOneChatActivity : AppCompatActivity() {
                     }
 
                     if (!isEndOfData) {
+                        Log.d("로그 요청","555555555")
                         val chatList = i.data.filterNot { it.cmd == "ReJoinPartyResult"}
                         val reversedChatList = chatList.reversed()
                         chatListAdapter.addChatDataAtFront(reversedChatList)

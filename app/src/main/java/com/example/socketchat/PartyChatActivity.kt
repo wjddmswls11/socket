@@ -55,7 +55,7 @@ class PartyChatActivity : AppCompatActivity() {
 
 
 
-        partyChatAdapter = PartyChatAdapter(currentUserMemNo, kotlinPartyMemberList, this)
+        partyChatAdapter = PartyChatAdapter(kotlinPartyMemberList)
 
         //partyChatAdapter 설정
         binding.partyListMessage.adapter = partyChatAdapter
