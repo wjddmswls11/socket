@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import com.example.socketchat.data.SummaryUserInfo
 import com.example.socketchat.databinding.ActivityMenuBinding
 import com.example.socketchat.fragment.AlarmFragment
 import com.example.socketchat.fragment.FriendFragment
@@ -22,53 +23,45 @@ class MenuActivity : AppCompatActivity() {
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val currentUserMemNo = intent.getIntExtra("MEMNO", -1)
-        val currentUserNickName = intent.getStringExtra("NICKNAME") ?: ""
-        val mainProfileUrl = intent.getStringExtra("MAINPROFILEURL") ?: ""
+        val summaryUserInfo = intent.getParcelableExtra<SummaryUserInfo>("SummaryUserInfo")
+
+        if (summaryUserInfo != null) {
+            initBottomNavigation(summaryUserInfo)
+        }
+
 
         viewModel.setupParty()
 
 
         //바텀네비게이션 보라색으로 나오던 것
         binding.mainBtn.itemIconTintList = null
-
-        initBottomNavigation(currentUserMemNo, currentUserNickName, mainProfileUrl)
-
     }
 
     //바텀내비 초기 설정
-    private fun initBottomNavigation(currentUserMemNo : Int, currentUserNickName : String, mainProfileUrl : String) {
+    private fun initBottomNavigation(summaryUserInfo: SummaryUserInfo) {
         replaceFragment(FriendFragment().apply {
-            arguments = bundleOf(
-                "currentUserMemNo" to currentUserMemNo,
-                "currentUserNickName" to currentUserNickName,
-                "mainProfileUrl" to mainProfileUrl
-            )
+            arguments = bundleOf("summaryUserInfo" to summaryUserInfo)
         })
 
         binding.mainBtn.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.menu1 -> {
                     replaceFragment(FriendFragment().apply {
-                        arguments = bundleOf(
-                            "currentUserMemNo" to currentUserMemNo,
-                            "currentUserNickName" to currentUserNickName,
-                            "mainProfileUrl" to mainProfileUrl
-                        )
+                        arguments = bundleOf("summaryUserInfo" to summaryUserInfo)
                     })
                     true
                 }
 
                 R.id.menu2 -> {
                     replaceFragment(PartyListFragment().apply {
-                        arguments = bundleOf("currentUserMemNo" to currentUserMemNo)
+                        arguments = bundleOf("summaryUserInfo" to summaryUserInfo)
                     })
                     true
                 }
 
                 R.id.menu3 -> {
                     replaceFragment(AlarmFragment().apply {
-                        arguments = bundleOf("currentUserMemNo" to currentUserMemNo)
+                        arguments = bundleOf("summaryUserInfo" to summaryUserInfo)
                     })
                     true
                 }

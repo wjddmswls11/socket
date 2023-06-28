@@ -6,8 +6,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.example.socketchat.OneOnOneChatActivity
 import com.example.socketchat.R
 import com.example.socketchat.data.Nt1On1TextChat
+import com.example.socketchat.data.SummaryUserInfoResponse
 import com.example.socketchat.databinding.ItemOneononechatLeftBinding
 import com.example.socketchat.databinding.ItemOneononechatRightBinding
 import com.example.socketchat.databinding.ItemOneononechatjoinBinding
@@ -17,7 +21,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class OneOnOneChatAdapter(
-    private val currentUserMemNo: Int, private val oneOnOneViewModel: OneOnOneViewModel
+    private val currentUserMemNo: Int, private val oneOnOneViewModel: OneOnOneViewModel,private val activity: OneOnOneChatActivity,
+    private val summaryData : SummaryUserInfoResponse
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -138,23 +143,12 @@ class OneOnOneChatAdapter(
 
     inner class OneOnOneChatLeftViewHolder(private val binding: ItemOneononechatLeftBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(oneOnOneChatData: Nt1On1TextChat?) {
-            val message = oneOnOneChatData?.data?.textChatInfo?.msg
-            val msgNo = oneOnOneChatData?.data?.commonRe1On1ChatInfo?.msgNo
-            val time = msgNo?.let { it -> convertTimestampToTime(it) }
-
-
-            binding.messageTextViewLeft.text = message
-            binding.messageTextViewReadLeft.text = time
-
-            if (oneOnOneChatData?.data?.commonRe1On1ChatInfo?.isDeleted == true) {
-                binding.messageTextViewLeft.text = " 삭제된 메시지입니다."
-                binding.messageTextViewLeft.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.baseline_report_blue, 0, 0, 0
-                )
-            } else {
-                binding.messageTextViewLeft.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-            }
+        fun bind(oneOnOneChat: Nt1On1TextChat?) {
+            binding.oneOnOneChat = oneOnOneChat
+            Glide.with(activity)
+                .load(summaryData.data.mainProfileUrl)
+                .transform(CircleCrop())
+                .into(binding.imgChatMessageLeft)
         }
     }
 

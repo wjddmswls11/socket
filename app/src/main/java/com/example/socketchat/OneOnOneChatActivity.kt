@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.socketchat.adapter.OneOnOneChatAdapter
+import com.example.socketchat.data.SummaryUserInfo
 import com.example.socketchat.data.SummaryUserInfoResponse
 import com.example.socketchat.databinding.ActivityChatSelectBinding
 import com.example.socketchat.viewmodel.OneOnOneViewModel
@@ -26,8 +27,6 @@ class OneOnOneChatActivity : AppCompatActivity() {
 
     private lateinit var chatListAdapter: OneOnOneChatAdapter
 
-    private lateinit var summaryData: SummaryUserInfoResponse
-
     private var lastMsgNo: Long = System.currentTimeMillis()
 
     //첫 실행인지 아닌지 판단하는 변수
@@ -42,17 +41,18 @@ class OneOnOneChatActivity : AppCompatActivity() {
         binding.listMessage.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        summaryData = intent.getSerializableExtra("summaryData") as SummaryUserInfoResponse
+        val summaryData = intent.getSerializableExtra("summaryData") as SummaryUserInfoResponse
+        val summaryUserInfo = intent.getParcelableExtra<SummaryUserInfo>("summaryUserInfo")
 
 
 
         viewModel.setupLobby()
 
-        val currentUserMemNo = intent.getIntExtra("currentUserMemNo", 0)
+        val currentUserMemNo = summaryUserInfo?.memNo ?: 0
         Log.d("ChatSelectActivity", "$summaryData")
 
         chatListAdapter =
-            OneOnOneChatAdapter(currentUserMemNo, oneOnOneViewModel)  // chatListAdapter 초기화
+            OneOnOneChatAdapter(currentUserMemNo, oneOnOneViewModel, this@OneOnOneChatActivity , summaryData)  // chatListAdapter 초기화
 
         // chatListAdapter 설정
         binding.listMessage.adapter = chatListAdapter
@@ -69,7 +69,7 @@ class OneOnOneChatActivity : AppCompatActivity() {
         binding.btnChatMessage.setOnClickListener {
             val msg = binding.editChatMessage.text.toString()
             if (msg.isNotBlank()) {
-                val currentMemNo = intent.getIntExtra("currentUserMemNo", 0)
+                val currentMemNo = summaryUserInfo?.memNo ?: 0
                 val targetMemNo = summaryData.data.memNo
                 viewModel.send1On1ChatRequest(
                     msg,
@@ -101,11 +101,11 @@ class OneOnOneChatActivity : AppCompatActivity() {
         }
 
 
-        val fromMemNo = currentUserMemNo
+
         val toMemNo = summaryData.data.memNo
 
         //채팅 로그 요청
-        oneOnOneApiViewModel.fetchOneOnOneChat(fromMemNo, toMemNo, lastMsgNo, false)
+        oneOnOneApiViewModel.fetchOneOnOneChat(currentUserMemNo, toMemNo, lastMsgNo, false)
         Log.d("라스트 메시지", "lastMagNo $lastMsgNo")
 
 
@@ -158,7 +158,7 @@ class OneOnOneChatActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy < 0) {
-                    oneOnOneApiViewModel.fetchOneOnOneChat(fromMemNo, toMemNo, lastMsgNo, false)
+                    oneOnOneApiViewModel.fetchOneOnOneChat(currentUserMemNo, toMemNo, lastMsgNo, false)
                 }
             }
         })

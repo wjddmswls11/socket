@@ -50,12 +50,7 @@ class MainActivity : AppCompatActivity() {
                 when (reAuthUsers.data.result) {
                     1 -> {
                         val intent = Intent(this@MainActivity, MenuActivity::class.java).apply {
-                            putExtra("NICKNAME", reAuthUsers.data.summaryUserInfo.nickName)
-                            putExtra("MEMNO", reAuthUsers.data.summaryUserInfo.memNo)
-                            putExtra(
-                                "MAINPROFILEURL",
-                                reAuthUsers.data.summaryUserInfo.mainProfileUrl
-                            )
+                            putExtra("SummaryUserInfo",  reAuthUsers.data.summaryUserInfo)
                         }
                         startActivity(intent)
                     }

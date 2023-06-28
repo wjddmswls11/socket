@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.socketchat.adapter.PartyListAdapter
 import com.example.socketchat.data.ReJoinPartyResponse
 import com.example.socketchat.data.ReJoinPartyResponseData
+import com.example.socketchat.data.SummaryUserInfo
 import com.example.socketchat.databinding.FragmentPartyListBinding
 import com.example.socketchat.socket.SocketDataRepository
 import com.example.socketchat.viewmodel.MenuApiViewModel
@@ -40,8 +41,10 @@ class PartyListFragment : Fragment() {
         //파티 생성 프래그먼트
         binding.btnCreateRoom.setOnClickListener {
             val dialogFragment = CreatePartyDialogFragment()
+            val summaryUserInfo =
+                requireArguments().getParcelable<SummaryUserInfo>("summaryUserInfo")
             val arguments = Bundle()
-            arguments.putInt("currentUserMemNo", requireArguments().getInt("currentUserMemNo", -1))
+            arguments.putParcelable("summaryUserInfo", summaryUserInfo)
             dialogFragment.arguments = arguments
             dialogFragment.show(childFragmentManager, "CreateCustomDialogFragment")
         }
@@ -54,10 +57,12 @@ class PartyListFragment : Fragment() {
 
         menuApiViewModel.fetchSummaryPartyList()
 
+        val summaryUserInfo = requireArguments().getParcelable<SummaryUserInfo>("summaryUserInfo")
+
         partyListAdapter =
             PartyListAdapter(
                 requireActivity(),
-                arguments?.getInt("currentUserMemNo", -1) ?: -1,
+                summaryUserInfo?.memNo ?: -1,
                 menuApiViewModel
             )
 

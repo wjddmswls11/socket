@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.socketchat.R
+import com.example.socketchat.data.SummaryUserInfo
 import com.example.socketchat.databinding.FragmentCreateCustomDialogBinding
 import com.example.socketchat.viewmodel.MenuApiViewModel
 import kotlinx.coroutines.launch
@@ -38,7 +39,8 @@ class CreatePartyDialogFragment : DialogFragment() {
         partyListFragment = parentFragment as PartyListFragment
 
         binding.btnCreateCheck.setOnClickListener {
-            val memNo = requireArguments().getInt("currentUserMemNo", 0)
+            val summaryUserInfo = requireArguments().getParcelable<SummaryUserInfo>("summaryUserInfo")
+            val memNo = summaryUserInfo?.memNo ?: -1
             val mainPhotoUrl = binding.editCreatePhotoUrl.text.toString()
             val title = binding.txtCreateTitle.text.toString()
             val maxMemberCountText = binding.editCreateMemberCount.text.toString()
