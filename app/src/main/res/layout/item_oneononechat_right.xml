@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+    <data>
+        <variable
+            name="oneOnOneChat"
+            type="com.example.socketchat.data.Nt1On1TextChat" />
+    </data>
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,7 +28,7 @@
             android:id="@+id/messageTextView_Read_Right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="시간"
+            app:timestamp="@{oneOnOneChat.data.commonRe1On1ChatInfo.msgNo}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/ctl_Chat_Right_Inner" />
 
@@ -42,7 +50,8 @@
                 android:layout_marginStart="6dp"
                 android:maxWidth="250dp"
                 android:padding="8dp"
-                android:text="adfsfsdaf"
+                app:messageText="@{oneOnOneChat.data.textChatInfo.msg}"
+                app:isDeleted="@{oneOnOneChat.data.commonRe1On1ChatInfo.isDeleted}"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -61,3 +70,5 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

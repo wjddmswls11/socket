@@ -106,15 +106,9 @@ class PartyChatAdapter(
     inner class PartyChatLeftViewHolder(private val binding: ItemPartychatLeftBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(partyChat: PartyChatResponse?) {
-            val message = partyChat?.data?.textChatInfo?.msg
-            val time =
-                partyChat?.data?.commonRePartyChatInfo?.msgNo?.let { convertTimestampToTime(it) }
-            binding.messageTextViewPartyLeft.text = message
-            binding.messageTextViewTimeLeft.text = time
-
+            binding.partyChat = partyChat
             val fromMemNo = partyChat?.data?.commonRePartyChatInfo?.fromMemNo
             val member = partyMemberList.flatMap { it.data }.find { it.memNo == fromMemNo }
-
             if (member != null) {
                 Glide.with(binding.root)
                     .load(member.mainProfileUrl)
@@ -130,11 +124,7 @@ class PartyChatAdapter(
     inner class PartyChatRightViewHolder(private val binding: ItemPartychatRightBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(partyChat: PartyChatResponse?) {
-            val message = partyChat?.data?.textChatInfo?.msg
-            val time =
-                partyChat?.data?.commonRePartyChatInfo?.msgNo?.let { convertTimestampToTime(it) }
-            binding.messageTextViewPartyRight.text = message
-            binding.messageTextViewTimeRight.text = time
+            binding.partyChat = partyChat
         }
     }
 

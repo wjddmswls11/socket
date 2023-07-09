@@ -80,12 +80,7 @@ class PartyListAdapter(private val fragmentActivity : FragmentActivity, private 
     inner class PartyViewHolder(val binding: ItemPartyListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(partyList: Party) {
-
-            binding.txtPartyListTitle.text = partyList.title
-            binding.txtPartyListMemNo.text = partyList.memNo.toString()
-            binding.txtPartyListCurMemberCount.text = partyList.curMemberCount.toString()
-            binding.txtPartyListMaxMemberCount.text = partyList.maxMemberCount.toString()
-
+            binding.partyList = partyList
             if (partyList.memNo == currentUserMemNo) {
                 binding.btnDestroyPartyList.visibility = View.VISIBLE
             } else {

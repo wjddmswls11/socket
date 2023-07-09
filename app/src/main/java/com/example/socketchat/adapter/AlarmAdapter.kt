@@ -46,14 +46,7 @@ class AlarmAdapter(private val activity : MenuActivity, private val menuViewMode
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(alarmList : NtRequestJoinPartyResponse) {
-            Glide.with(activity)
-                .load(alarmList.data.rqUserInfo.mainProfileUrl)
-                .transform(CircleCrop())
-                .into(binding.imgAlarmProfile)
-
-            binding.messageTextViewChatNickName.text = alarmList.data.rqUserInfo.nickName
-
-            binding.messageTextViewChatPartyNo.text = alarmList.data.summaryPartyInfo.partyNo.toString()
+            binding.alarmList = alarmList
 
             binding.buttonChatLeft.setOnClickListener {
                 val partyNo = alarmList.data.summaryPartyInfo.partyNo
@@ -75,7 +68,8 @@ class AlarmAdapter(private val activity : MenuActivity, private val menuViewMode
                 // 해당 아이템 제거
                 removeItem(bindingAdapterPosition)
             }
-
+            // binding 객체에 executePendingBindings를 호출하여 즉시 UI를 갱신합니다.
+            binding.executePendingBindings()
         }
 
 

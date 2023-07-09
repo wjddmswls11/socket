@@ -155,27 +155,7 @@ class OneOnOneChatAdapter(
     inner class OneOnOneChatRightViewHolder(private val binding: ItemOneononechatRightBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(oneOnOneChatData: Nt1On1TextChat?, position: Int) {
-            val message = oneOnOneChatData?.data?.textChatInfo?.msg
-            val msgNo = oneOnOneChatData?.data?.commonRe1On1ChatInfo?.msgNo
-            val time = msgNo?.let { it -> convertTimestampToTime(it) }
-
-            binding.messageTextViewRight.text = message
-            binding.messageTextViewReadRight.text = time
-
-            if (oneOnOneChatData?.data?.commonRe1On1ChatInfo?.isDeleted == true) {
-                binding.messageTextViewRight.text = " 삭제된 메시지입니다."
-                binding.messageTextViewRight.setTextColor(itemView.context.getColor(R.color.gray_bottom))
-                binding.messageTextViewRight.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.baseline_report_24,
-                    0,
-                    0,
-                    0
-                )
-            } else {
-                binding.messageTextViewRight.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-            }
-
-
+            binding.oneOnOneChat = oneOnOneChatData
             // "삭제하시겠습니까?" 다이얼로그를 보여주는 함수
             if (!oneOnOneChatList[position].data.commonRe1On1ChatInfo.isDeleted) {
                 binding.ctlChatRight.setOnLongClickListener {
@@ -183,11 +163,6 @@ class OneOnOneChatAdapter(
                     val delMsgNo = chatData.data.commonRe1On1ChatInfo.msgNo
                     val fromMemNoLongClick = chatData.data.commonRe1On1ChatInfo.fromMemNo
                     val toMemNo = chatData.data.commonRe1On1ChatInfo.toMemNo
-
-                    Log.d(
-                        "ChatListAdapter 삭제",
-                        "delMsgNo: $delMsgNo, fromMemNo: $fromMemNoLongClick, toMemNo: $toMemNo"
-                    )
 
                     AlertDialog.Builder(itemView.context)
                         .setMessage("삭제하시겠습니까?")
@@ -209,33 +184,14 @@ class OneOnOneChatAdapter(
     inner class OneOnOneChatJoinViewHolder(private val binding: ItemOneononechatjoinBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(oneOnOneChatData: Nt1On1TextChat?) {
-            binding.messageTextViewChatNickName.text =
-                oneOnOneChatData?.data?.rqUserInfo?.nickName
-            binding.messageTextViewChatPartyNo.text =
-                oneOnOneChatData?.data?.summaryPartyInfo?.partyNo.toString()
+            binding.oneOnOneChat = oneOnOneChatData
         }
     }
 
     inner class OneOnOneChatReJoinViewHolder(private val binding: ItemOneononechatrejoinBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(oneOnOneChatData: Nt1On1TextChat?) {
-            binding.messageTextViewRejoinChatFirst.text =
-                oneOnOneChatData?.data?.rqJoinParty?.partyNo.toString()
-            binding.messageTextViewRejoinCHatThird.text =
-                oneOnOneChatData?.data?.commonRe1On1ChatInfo?.replyMsgNo.toString()
-
-            //숫자에 따라 다른 텍스트 표시
-            when (oneOnOneChatData?.data?.commonRe1On1ChatInfo?.replyMsgNo?.toInt()) {
-                0 -> binding.messageTextViewRejoinCHatThird.text = "신청되었습니다"
-                1 -> binding.messageTextViewRejoinCHatThird.text = "방장이 거절했습니다"
-                2 -> binding.messageTextViewRejoinCHatThird.text = "빈방이 없습니다"
-                3 -> binding.messageTextViewRejoinCHatThird.text = "방이 꽉 찼습니다"
-                4 -> binding.messageTextViewRejoinCHatThird.text = "이미 참석해 있습니다"
-                5 -> binding.messageTextViewRejoinCHatThird.text = "이미 참석 신청을 해놓았습니다"
-                6 -> binding.messageTextViewRejoinCHatThird.text = "강퇴 유저입니다"
-                7 -> binding.messageTextViewRejoinCHatThird.text = "방장 승락대기중입니다"
-                else -> binding.messageTextViewRejoinCHatThird.text = "기타"
-            }
+            binding.oneOnOneChat = oneOnOneChatData
         }
     }
 }
